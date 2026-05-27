@@ -1,7 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
 
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-
 function stripMarkdown(text) {
   return text
     .replace(/\*\*(.*?)\*\*/g, "$1")
@@ -17,6 +15,8 @@ export async function POST(request) {
     return Response.json({ lore: "[Lore disabled in dev mode]" });
   }
 
+  const client = new Anthropic();
+
   try {
     const { card } = await request.json();
 
@@ -27,7 +27,7 @@ export async function POST(request) {
     const prompt = `You are a lore scholar of the Magic: The Gathering multiverse. Write a 2-3 sentence in-world encyclopedia entry for "${card.name}" (${card.type_line}). ${card.oracle_text ? `The card text reads: "${card.oracle_text}".` : ""} ${card.flavor_text ? `Its flavor text: "${card.flavor_text}".` : ""} Write atmospherically as if from an ancient tome — focus on world-building and story, not card mechanics. Under 75 words. Do not use markdown formatting, bold, or asterisks — plain prose only.`;
 
     const message = await client.messages.create({
-      model: "claude-sonnet-4-20250514",
+      model: "claude-sonnet-4-6",
       max_tokens: 1024,
       messages: [{ role: "user", content: prompt }],
     });
