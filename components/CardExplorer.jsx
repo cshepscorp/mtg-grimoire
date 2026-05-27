@@ -128,42 +128,75 @@ function CardGrid({ cards, label, sublabel, loading, loadingText, onSelectCard, 
   );
 }
 
-// Nav arrow — circular button flanking the card image
-function NavArrow({ direction, onClick, visible }) {
+// Desktop nav arrow — fixed to viewport edges, hidden on mobile via media query
+function NavArrow({ direction, onClick, visible, sidebarWidth }) {
   const [hovered, setHovered] = useState(false);
   if (!visible) return null;
   return (
-    <button
-      onClick={onClick}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      aria-label={direction === "prev" ? "Previous card" : "Next card"}
-      style={{
-        position: "absolute",
-        top: "40%",
-        transform: "translateY(-50%)",
-        [direction === "prev" ? "left" : "right"]: -44,
-        width: 36, height: 36,
-        borderRadius: "50%",
-        background: hovered ? "rgba(201,185,154,0.15)" : "rgba(201,185,154,0.05)",
-        border: "0.5px solid " + (hovered ? "rgba(201,185,154,0.5)" : "rgba(201,185,154,0.2)"),
-        cursor: "pointer",
-        display: "flex", alignItems: "center", justifyContent: "center",
-        transition: "background 0.2s, border-color 0.2s",
-        zIndex: 10,
-        flexShrink: 0,
-      }}
-    >
-      <span style={{
-        fontSize: 20,
-        color: hovered ? "#c9b99a" : "rgba(201,185,154,0.4)",
-        transition: "color 0.2s",
-        userSelect: "none",
-        lineHeight: 1,
+    <>
+      <style>{`@media (max-width: 640px) { .grimoire-nav-arrow { display: none !important; } }`}</style>
+      <button
+        className="grimoire-nav-arrow"
+        onClick={onClick}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+        aria-label={direction === "prev" ? "Previous card" : "Next card"}
+        style={{
+          position: "fixed",
+          top: "50%",
+          transform: "translateY(-50%)",
+          [direction === "prev" ? "left" : "right"]: direction === "prev" ? sidebarWidth + 12 : 12,
+          width: 40, height: 40,
+          borderRadius: "50%",
+          background: hovered ? "rgba(201,185,154,0.15)" : "rgba(201,185,154,0.05)",
+          border: "0.5px solid " + (hovered ? "rgba(201,185,154,0.5)" : "rgba(201,185,154,0.2)"),
+          cursor: "pointer",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          transition: "background 0.2s, border-color 0.2s",
+          zIndex: 20,
+        }}
+      >
+        <span style={{
+          fontSize: 22,
+          color: hovered ? "#c9b99a" : "rgba(201,185,154,0.4)",
+          transition: "color 0.2s",
+          userSelect: "none",
+          lineHeight: 1,
+        }}>
+          {direction === "prev" ? "‹" : "›"}
+        </span>
+      </button>
+    </>
+  );
+}
+
+// Mobile nav row — prev/next buttons shown below card on small screens
+function MobileNav({ onPrev, onNext, canPrev, canNext, index, total }) {
+  if (!canPrev && !canNext) return null;
+  return (
+    <>
+      <style>{`@media (min-width: 641px) { .grimoire-mobile-nav { display: none !important; } }`}</style>
+      <div className="grimoire-mobile-nav" style={{
+        display: "flex", alignItems: "center", justifyContent: "space-between",
+        marginTop: 24, gap: 12,
       }}>
-        {direction === "prev" ? "‹" : "›"}
-      </span>
-    </button>
+        <button onClick={onPrev} disabled={!canPrev} style={{
+          flex: 1, padding: "10px", borderRadius: 8,
+          background: "rgba(201,185,154,0.08)", border: "0.5px solid rgba(201,185,154,0.2)",
+          color: canPrev ? "#c9b99a" : "rgba(201,185,154,0.2)",
+          fontSize: 13, cursor: canPrev ? "pointer" : "default", fontFamily: "inherit",
+        }}>‹ Prev</button>
+        <div style={{ fontSize: 11, color: "rgba(201,185,154,0.4)", whiteSpace: "nowrap" }}>
+          {index + 1} / {total}
+        </div>
+        <button onClick={onNext} disabled={!canNext} style={{
+          flex: 1, padding: "10px", borderRadius: 8,
+          background: "rgba(201,185,154,0.08)", border: "0.5px solid rgba(201,185,154,0.2)",
+          color: canNext ? "#c9b99a" : "rgba(201,185,154,0.2)",
+          fontSize: 13, cursor: canNext ? "pointer" : "default", fontFamily: "inherit",
+        }}>Next ›</button>
+      </div>
+    </>
   );
 }
 
@@ -532,7 +565,14 @@ export default function CardExplorer() {
           )}
 
           {view === VIEW_CARD && (
-            <div style={{ padding: "2.5rem 4rem", maxWidth: 860, margin: "0 auto" }}>
+            <>
+              <style>{`
+                @media (max-width: 640px) {
+                  .grimoire-card-grid { grid-template-columns: 1fr !important; }
+                  .grimoire-card-view { padding: 1.25rem !important; }
+                }
+              `}</style>
+              <div className="grimoire-card-view" style={{ padding: "2.5rem 4rem", maxWidth: 860, margin: "0 auto" }}>
 
               {/* Back to gallery + position indicator */}
               {galleryContext && (
@@ -556,12 +596,10 @@ export default function CardExplorer() {
               {error && <div style={{ color: "#e8a27c", fontSize: 13, padding: "1rem 0" }}>{error}</div>}
 
               {!randomLoading && activeCard && (
-                <div style={{ display: "grid", gridTemplateColumns: "280px 1fr", gap: "2.5rem", alignItems: "start" }}>
+                <div className="grimoire-card-grid" style={{ display: "grid", gridTemplateColumns: "280px 1fr", gap: "2.5rem", alignItems: "start" }}>
 
                   {/* Left */}
-                  <div style={{ position: "relative" }}>
-                    <NavArrow direction="prev" onClick={() => navigateGallery(-1)} visible={canGoPrev} />
-                    <NavArrow direction="next" onClick={() => navigateGallery(1)} visible={canGoNext} />
+                  <div>
                     <div
                       onClick={() => cardImageUrl && setLightboxOpen(true)}
                       style={{
@@ -601,6 +639,18 @@ export default function CardExplorer() {
                           ))}
                         </div>
                       </div>
+                    )}
+
+                    {/* Mobile prev/next */}
+                    {galleryContext && (
+                      <MobileNav
+                        onPrev={() => navigateGallery(-1)}
+                        onNext={() => navigateGallery(1)}
+                        canPrev={canGoPrev}
+                        canNext={canGoNext}
+                        index={galleryContext.index}
+                        total={galleryContext.cards.length}
+                      />
                     )}
                   </div>
 
@@ -671,9 +721,14 @@ export default function CardExplorer() {
                 </div>
               )}
             </div>
+            </>
           )}
         </main>
       </div>
+
+      {/* Desktop gallery nav arrows */}
+      <NavArrow direction="prev" onClick={() => navigateGallery(-1)} visible={canGoPrev} sidebarWidth={SIDEBAR_WIDTH} />
+      <NavArrow direction="next" onClick={() => navigateGallery(1)} visible={canGoNext} sidebarWidth={0} />
 
       {/* Lightbox */}
       {lightboxOpen && lightboxImageUrl && (
