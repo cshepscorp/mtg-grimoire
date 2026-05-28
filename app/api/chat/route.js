@@ -12,6 +12,10 @@ function stripMarkdown(text) {
 }
 
 export async function POST(request) {
+  if (process.env.NEXT_PUBLIC_DISABLE_LORE === "true") {
+    return Response.json({ message: "[Chat disabled in dev mode]" });
+  }
+
   try {
     const { messages, card, config } = await request.json();
     const { format, rarities, budget, playstyle, isCommander } = config;
