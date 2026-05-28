@@ -504,7 +504,7 @@ export default function CardExplorer() {
             placeholder={searchMode === "artist" ? "Search for an artist..." : "Search for a card..."}
             style={{
               background: "rgba(255,255,255,0.04)", border: "0.5px solid rgba(201,185,154,0.25)",
-              borderRadius: 6, padding: "8px 14px", color: "#e8dcc8", fontSize: 13,
+              borderRadius: 6, padding: "8px 14px", color: "#e8dcc8", fontSize: 16,
               width: 220, fontFamily: "inherit",
             }}
           />

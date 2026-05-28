@@ -477,7 +477,7 @@ export default function DeckChat({ card, isOpen, onClose }) {
                   flex: 1, background: "rgba(255,255,255,0.04)",
                   border: "0.5px solid rgba(201,185,154,0.2)",
                   borderRadius: 8, padding: "10px 14px",
-                  color: "#e8dcc8", fontSize: 13, fontFamily: "Georgia, serif",
+                  color: "#e8dcc8", fontSize: 16, fontFamily: "Georgia, serif",
                   outline: "none",
                 }}
               />
