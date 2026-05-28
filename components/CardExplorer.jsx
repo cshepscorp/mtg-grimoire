@@ -2,86 +2,17 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import DeckChat from "./DeckChat";
-
-const MANA_COLORS = {
-  W: { bg: "#f9f6d2", color: "#7a6a00" },
-  U: { bg: "#b3ceea", color: "#1a3e6e" },
-  B: { bg: "#4a3f42", color: "#f0e8e8" },
-  R: { bg: "#e8a27c", color: "#7a2200" },
-  G: { bg: "#a9c9a7", color: "#1a4a1a" },
-};
+import { parseMana, replaceSymbols } from "./card/ManaPip";
+import ClickableBadge from "./card/ClickableBadge";
+import PrintingThumb from "./card/PrintingThumb";
+import NavArrow from "./nav/NavArrow";
+import MobileNav from "./nav/MobileNav";
+import useArtistHistory from "../hooks/useArtistHistory";
+import useGallery from "../hooks/useGallery";
+import { VIEW_CARD, VIEW_SEARCH, VIEW_ARTIST, VIEW_FILTER } from "../utils/constants";
 
 const SIDEBAR_WIDTH = 200;
-const ARTISTS_KEY = "grimoire_artists";
 
-const VIEW_CARD = "card";
-const VIEW_SEARCH = "search";
-const VIEW_ARTIST = "artist";
-const VIEW_FILTER = "filter";
-
-function ManaPip({ symbol }) {
-  const style = MANA_COLORS[symbol];
-  return (
-    <span style={{
-      display: "inline-flex", alignItems: "center", justifyContent: "center",
-      width: 22, height: 22, borderRadius: "50%",
-      background: style?.bg ?? "#ccc8c0",
-      color: style?.color ?? "#3a3634",
-      fontSize: 10, fontWeight: 700,
-      border: "1px solid rgba(0,0,0,0.2)",
-      flexShrink: 0,
-    }}>{symbol}</span>
-  );
-}
-
-function parseMana(cost) {
-  if (!cost) return null;
-  const pips = [...cost.matchAll(/\{([^}]+)\}/g)].map((m) => m[1]);
-  return (
-    <div style={{ display: "flex", gap: 4, flexWrap: "wrap", alignItems: "center" }}>
-      {pips.map((p, i) => <ManaPip key={i} symbol={p} />)}
-    </div>
-  );
-}
-
-function replaceSymbols(text) {
-  if (!text) return null;
-  return text.split(/(\{[^}]+\})/g).map((part, i) => {
-    const m = part.match(/^\{([^}]+)\}$/);
-    return m ? <ManaPip key={i} symbol={m[1]} /> : <span key={i}>{part}</span>;
-  });
-}
-
-function ClickableBadge({ children, onClick }) {
-  return (
-    <span onClick={onClick} style={{
-      fontSize: 11, padding: "3px 10px", borderRadius: 99,
-      background: "rgba(255,255,255,0.06)", color: "#c9b99a",
-      border: "0.5px solid rgba(201,185,154,0.2)",
-      textTransform: "capitalize", letterSpacing: "0.03em",
-      cursor: "pointer", transition: "background 0.15s, border-color 0.15s",
-    }}
-      onMouseEnter={e => { e.currentTarget.style.background = "rgba(201,185,154,0.15)"; e.currentTarget.style.borderColor = "rgba(201,185,154,0.4)"; }}
-      onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.06)"; e.currentTarget.style.borderColor = "rgba(201,185,154,0.2)"; }}
-    >{children}</span>
-  );
-}
-
-function PrintingThumb({ card, active, onClick }) {
-  const thumb = card.image_uris?.small;
-  if (!thumb) return null;
-  return (
-    <div onClick={onClick} style={{
-      flexShrink: 0, width: 52, borderRadius: 4, overflow: "hidden",
-      cursor: "pointer",
-      border: active ? "2px solid #c9b99a" : "2px solid transparent",
-      opacity: active ? 1 : 0.55,
-      transition: "opacity 0.15s, border-color 0.15s",
-    }}>
-      <img src={thumb} alt={card.set_name} style={{ width: "100%", display: "block" }} />
-    </div>
-  );
-}
 
 function CardGrid({ cards, label, sublabel, loading, loadingText, onSelectCard, onBack }) {
   return (
@@ -129,77 +60,6 @@ function CardGrid({ cards, label, sublabel, loading, loadingText, onSelectCard, 
   );
 }
 
-// Desktop nav arrow — fixed to viewport edges, hidden on mobile via media query
-function NavArrow({ direction, onClick, visible, sidebarWidth }) {
-  const [hovered, setHovered] = useState(false);
-  if (!visible) return null;
-  return (
-    <>
-      <style>{`@media (max-width: 640px) { .grimoire-nav-arrow { display: none !important; } }`}</style>
-      <button
-        className="grimoire-nav-arrow"
-        onClick={onClick}
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
-        aria-label={direction === "prev" ? "Previous card" : "Next card"}
-        style={{
-          position: "fixed",
-          top: "50%",
-          transform: "translateY(-50%)",
-          [direction === "prev" ? "left" : "right"]: direction === "prev" ? sidebarWidth + 12 : 12,
-          width: 40, height: 40,
-          borderRadius: "50%",
-          background: hovered ? "rgba(201,185,154,0.15)" : "rgba(201,185,154,0.05)",
-          border: "0.5px solid " + (hovered ? "rgba(201,185,154,0.5)" : "rgba(201,185,154,0.2)"),
-          cursor: "pointer",
-          display: "flex", alignItems: "center", justifyContent: "center",
-          transition: "background 0.2s, border-color 0.2s",
-          zIndex: 20,
-        }}
-      >
-        <span style={{
-          fontSize: 22,
-          color: hovered ? "#c9b99a" : "rgba(201,185,154,0.4)",
-          transition: "color 0.2s",
-          userSelect: "none",
-          lineHeight: 1,
-        }}>
-          {direction === "prev" ? "‹" : "›"}
-        </span>
-      </button>
-    </>
-  );
-}
-
-// Mobile nav row — prev/next buttons shown below card on small screens
-function MobileNav({ onPrev, onNext, canPrev, canNext, index, total }) {
-  if (!canPrev && !canNext) return null;
-  return (
-    <>
-      <style>{`@media (min-width: 641px) { .grimoire-mobile-nav { display: none !important; } }`}</style>
-      <div className="grimoire-mobile-nav" style={{
-        display: "flex", alignItems: "center", justifyContent: "space-between",
-        marginTop: 24, gap: 12,
-      }}>
-        <button onClick={onPrev} disabled={!canPrev} style={{
-          flex: 1, padding: "10px", borderRadius: 8,
-          background: "rgba(201,185,154,0.08)", border: "0.5px solid rgba(201,185,154,0.2)",
-          color: canPrev ? "#c9b99a" : "rgba(201,185,154,0.2)",
-          fontSize: 13, cursor: canPrev ? "pointer" : "default", fontFamily: "inherit",
-        }}>‹ Prev</button>
-        <div style={{ fontSize: 11, color: "rgba(201,185,154,0.4)", whiteSpace: "nowrap" }}>
-          {index + 1} / {total}
-        </div>
-        <button onClick={onNext} disabled={!canNext} style={{
-          flex: 1, padding: "10px", borderRadius: 8,
-          background: "rgba(201,185,154,0.08)", border: "0.5px solid rgba(201,185,154,0.2)",
-          color: canNext ? "#c9b99a" : "rgba(201,185,154,0.2)",
-          fontSize: 13, cursor: canNext ? "pointer" : "default", fontFamily: "inherit",
-        }}>Next ›</button>
-      </div>
-    </>
-  );
-}
 
 export default function CardExplorer() {
   const [query, setQuery] = useState("");
@@ -232,43 +92,18 @@ export default function CardExplorer() {
   const [filterCards, setFilterCards] = useState([]);
   const [filterLoading, setFilterLoading] = useState(false);
 
-  // Gallery navigation context — which list and index we came from
-  const [galleryContext, setGalleryContext] = useState(null); // { cards, index, label }
-
-  // Sidebar artist history
-  const [artists, setArtists] = useState([]);
+  const { artists, addArtist, clearArtists } = useArtistHistory();
+  const { galleryContext, setGalleryContext, navigateGallery, goBackToGallery, canGoPrev, canGoNext } = useGallery({ setView, view });
 
   // Touch tracking for swipe
   const touchStartX = useRef(null);
 
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem(ARTISTS_KEY);
-      if (saved) setArtists(JSON.parse(saved));
-    } catch {}
-  }, []);
-
-  const addArtist = useCallback((artistName) => {
-    if (!artistName) return;
-    setArtists((prev) => {
-      if (prev.includes(artistName)) return prev;
-      const updated = [artistName, ...prev];
-      try { localStorage.setItem(ARTISTS_KEY, JSON.stringify(updated)); } catch {}
-      return updated;
-    });
-  }, []);
-
-  const clearArtists = () => {
-    setArtists([]);
-    try { localStorage.removeItem(ARTISTS_KEY); } catch {}
-  };
-
-  useEffect(() => {
     const handler = (e) => {
       if (e.key === "Escape") setLightboxOpen(false);
       if (view === VIEW_CARD && galleryContext && !lightboxOpen) {
-        if (e.key === "ArrowLeft") navigateGallery(-1);
-        if (e.key === "ArrowRight") navigateGallery(1);
+        if (e.key === "ArrowLeft") navigateGallery(-1, loadCard);
+        if (e.key === "ArrowRight") navigateGallery(1, loadCard);
       }
     };
     window.addEventListener("keydown", handler);
@@ -316,24 +151,6 @@ export default function CardExplorer() {
     fetchLore(cardData);
   }, [fetchLore, addArtist]);
 
-  const navigateGallery = useCallback((delta) => {
-    if (!galleryContext) return;
-    const { cards, index, label } = galleryContext;
-    const newIndex = index + delta;
-    if (newIndex < 0 || newIndex >= cards.length) return;
-    const nextCard = cards[newIndex];
-    loadCard(nextCard, newIndex, cards, label);
-  }, [galleryContext, loadCard]);
-
-  const goBackToGallery = useCallback(() => {
-    if (!galleryContext) return;
-    const { label } = galleryContext;
-    if (label === VIEW_ARTIST) setView(VIEW_ARTIST);
-    else if (label === VIEW_SEARCH) setView(VIEW_SEARCH);
-    else if (label === VIEW_FILTER) setView(VIEW_FILTER);
-    else setView(VIEW_CARD);
-    setGalleryContext(null);
-  }, [galleryContext]);
 
   const doRandom = useCallback(async () => {
     setRandomLoading(true);
@@ -433,7 +250,7 @@ export default function CardExplorer() {
     if (touchStartX.current === null) return;
     const dx = e.changedTouches[0].clientX - touchStartX.current;
     if (Math.abs(dx) > 60 && view === VIEW_CARD && galleryContext) {
-      navigateGallery(dx < 0 ? 1 : -1);
+      navigateGallery(dx < 0 ? 1 : -1, loadCard);
     }
     touchStartX.current = null;
   };
@@ -442,9 +259,6 @@ export default function CardExplorer() {
   const cardImageUrl = activeCard?.image_uris?.normal;
   const lightboxImageUrl = activeCard?.image_uris?.png || activeCard?.image_uris?.large || cardImageUrl;
   const isLoading = randomLoading || searchLoading || artistLoading || filterLoading;
-  const hasGalleryNav = view === VIEW_CARD && galleryContext && galleryContext.cards.length > 1;
-  const canGoPrev = hasGalleryNav && galleryContext.index > 0;
-  const canGoNext = hasGalleryNav && galleryContext.index < galleryContext.cards.length - 1;
 
   return (
     <div
@@ -682,8 +496,8 @@ export default function CardExplorer() {
                     {/* Mobile prev/next */}
                     {galleryContext && (
                       <MobileNav
-                        onPrev={() => navigateGallery(-1)}
-                        onNext={() => navigateGallery(1)}
+                        onPrev={() => navigateGallery(-1, loadCard)}
+                        onNext={() => navigateGallery(1, loadCard)}
                         canPrev={canGoPrev}
                         canNext={canGoNext}
                         index={galleryContext.index}
@@ -781,8 +595,8 @@ export default function CardExplorer() {
       </div>
 
       {/* Desktop gallery nav arrows */}
-      <NavArrow direction="prev" onClick={() => navigateGallery(-1)} visible={canGoPrev} sidebarWidth={SIDEBAR_WIDTH} />
-      <NavArrow direction="next" onClick={() => navigateGallery(1)} visible={canGoNext} sidebarWidth={0} />
+      <NavArrow direction="prev" onClick={() => navigateGallery(-1, loadCard)} visible={canGoPrev} sidebarWidth={SIDEBAR_WIDTH} />
+      <NavArrow direction="next" onClick={() => navigateGallery(1, loadCard)} visible={canGoNext} sidebarWidth={0} />
 
       {/* Lightbox */}
       {lightboxOpen && lightboxImageUrl && (
