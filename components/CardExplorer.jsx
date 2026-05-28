@@ -13,6 +13,7 @@ import useArtistHistory from "../hooks/useArtistHistory";
 import useGallery from "../hooks/useGallery";
 import useScryfall from "../hooks/useScryfall";
 import { VIEW_CARD, VIEW_SEARCH, VIEW_ARTIST, VIEW_FILTER } from "../utils/constants";
+import styles from "./CardExplorer.module.css";
 
 const SIDEBAR_WIDTH = 200;
 
@@ -124,8 +125,7 @@ export default function CardExplorer() {
 
           {view === VIEW_CARD && (
             <>
-              <style>{`@media (max-width: 640px) { .grimoire-card-grid { grid-template-columns: 1fr !important; } .grimoire-card-view { padding: 1.25rem !important; } }`}</style>
-              <div className="grimoire-card-view" style={{ padding: "2.5rem 4rem", maxWidth: 860, margin: "0 auto" }}>
+              <div className={styles.cardView} style={{ padding: "2.5rem 4rem", maxWidth: 860, margin: "0 auto" }}>
 
               {/* Back to gallery + position indicator */}
               {galleryContext && (
@@ -149,7 +149,7 @@ export default function CardExplorer() {
               {error && <div style={{ color: "#e8a27c", fontSize: 13, padding: "1rem 0" }}>{error}</div>}
 
               {!randomLoading && activeCard && (
-                <div className="grimoire-card-grid" style={{ display: "grid", gridTemplateColumns: "280px 1fr", gap: "2.5rem", alignItems: "start" }}>
+                <div className={styles.cardGrid} style={{ display: "grid", gridTemplateColumns: "280px 1fr", gap: "2.5rem", alignItems: "start" }}>
 
                   {/* Left */}
                   <div>

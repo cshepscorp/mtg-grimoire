@@ -1,0 +1,51 @@
+@media (max-width: 640px) {
+  .header {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    height: auto !important;
+    padding: 0.75rem 1rem !important;
+    gap: 8px !important;
+  }
+  .headerTop {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .headerSubtitle {
+    display: none !important;
+  }
+  .headerForm {
+    flex-direction: column !important;
+    gap: 6px !important;
+  }
+  .headerForm input {
+    width: 100% !important;
+  }
+  .formRow {
+    display: flex;
+    gap: 6px;
+    width: 100%;
+  }
+  .toggle {
+    flex: 0 0 auto;
+  }
+  .searchBtn {
+    flex: 1;
+    margin-left: auto;
+  }
+  .randomDesktop {
+    display: none !important;
+  }
+}
+
+@media (min-width: 641px) {
+  .headerTop {
+    display: contents;
+  }
+  .formRow {
+    display: contents;
+  }
+  .randomBtn {
+    display: none !important;
+  }
+}

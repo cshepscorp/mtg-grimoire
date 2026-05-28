@@ -1,0 +1,5 @@
+@media (min-width: 641px) {
+  .mobileNav {
+    display: none !important;
+  }
+}

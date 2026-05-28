@@ -1,0 +1,8 @@
+@media (max-width: 640px) {
+  .cardGrid {
+    grid-template-columns: 1fr !important;
+  }
+  .cardView {
+    padding: 1.25rem !important;
+  }
+}
