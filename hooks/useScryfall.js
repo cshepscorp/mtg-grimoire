@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from "react";
-import { VIEW_CARD, VIEW_SEARCH, VIEW_ARTIST, VIEW_FILTER } from "../utils/constants";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { VIEW_CARD, VIEW_SEARCH, VIEW_ARTIST, VIEW_FILTER, VIEW_SETS } from "../utils/constants";
 
 export default function useScryfall({ addArtist, setGalleryContext, setView }) {
   const [card, setCard] = useState(null);
@@ -7,6 +7,8 @@ export default function useScryfall({ addArtist, setGalleryContext, setView }) {
   const [activePrinting, setActivePrinting] = useState(0);
   const [lore, setLore] = useState("");
   const [loreLoading, setLoreLoading] = useState(false);
+  const [rulings, setRulings] = useState([]);
+  const [rulingsLoading, setRulingsLoading] = useState(false);
   const [randomLoading, setRandomLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -23,6 +25,10 @@ export default function useScryfall({ addArtist, setGalleryContext, setView }) {
   const [filterCards, setFilterCards] = useState([]);
   const [filterLoading, setFilterLoading] = useState(false);
 
+  const [sets, setSets] = useState([]);
+  const [setsLoading, setSetsLoading] = useState(false);
+  const setsFetchedRef = useRef(false);
+
   const fetchLore = useCallback(async (cardData) => {
     setLoreLoading(true);
     setLore("");
@@ -38,6 +44,17 @@ export default function useScryfall({ addArtist, setGalleryContext, setView }) {
       setLore("The archives are currently inaccessible.");
     }
     setLoreLoading(false);
+  }, []);
+
+  const fetchRulings = useCallback(async (cardId) => {
+    setRulingsLoading(true);
+    setRulings([]);
+    try {
+      const res = await fetch(`https://api.scryfall.com/cards/${cardId}/rulings`);
+      const data = await res.json();
+      setRulings(data.data ?? []);
+    } catch {}
+    setRulingsLoading(false);
   }, []);
 
   const loadCard = useCallback(async (cardData, galleryIndex = null, galleryCards = null, galleryLabel = null) => {
@@ -59,7 +76,8 @@ export default function useScryfall({ addArtist, setGalleryContext, setView }) {
       setPrintings([cardData]);
     }
     fetchLore(cardData);
-  }, [fetchLore, setGalleryContext, setView]);
+    fetchRulings(cardData.id);
+  }, [fetchLore, fetchRulings, setGalleryContext, setView]);
 
   const doRandom = useCallback(async () => {
     setRandomLoading(true);
@@ -135,6 +153,21 @@ export default function useScryfall({ addArtist, setGalleryContext, setView }) {
     setSearchLoading(false);
   }, [loadCard, openArtist, setView]);
 
+  const openSetBrowser = useCallback(async () => {
+    setView(VIEW_SETS);
+    if (setsFetchedRef.current) return;
+    setsFetchedRef.current = true;
+    setSetsLoading(true);
+    try {
+      const res = await fetch("https://api.scryfall.com/sets");
+      const data = await res.json();
+      setSets(data.data ?? []);
+    } catch {
+      setsFetchedRef.current = false;
+    }
+    setSetsLoading(false);
+  }, [setView]);
+
   const openFilter = useCallback(async (label, sublabel, scryfallQuery) => {
     setFilterLabel(label);
     setFilterSublabel(sublabel);
@@ -161,12 +194,14 @@ export default function useScryfall({ addArtist, setGalleryContext, setView }) {
   return {
     card, printings, activePrinting, setActivePrinting,
     lore, loreLoading,
+    rulings, rulingsLoading,
     randomLoading, searchLoading, artistLoading, filterLoading,
     error,
     loadCard, doRandom, doSearch, openArtist, openFilter,
     searchResults, searchQuery,
     artistCards, selectedArtist,
     filterCards, filterLabel, filterSublabel,
+    sets, setsLoading, openSetBrowser,
     activeCard, cardImageUrl, lightboxImageUrl,
     isLoading,
   };

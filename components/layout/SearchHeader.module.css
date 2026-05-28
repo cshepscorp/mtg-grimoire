@@ -36,6 +36,9 @@
   .randomDesktop {
     display: none !important;
   }
+  .setsBtn {
+    display: none !important;
+  }
 }
 
 @media (min-width: 641px) {

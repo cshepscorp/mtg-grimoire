@@ -1,6 +1,6 @@
 import styles from "./SearchHeader.module.css";
 
-export default function SearchHeader({ query, setQuery, searchMode, setSearchMode, onSearch, onRandom, isLoading, onLogoClick }) {
+export default function SearchHeader({ query, setQuery, searchMode, setSearchMode, onSearch, onRandom, onOpenSets, isLoading, onLogoClick }) {
   return (
     <header className={styles.header} style={{
       borderBottom: "0.5px solid rgba(201,185,154,0.15)",
@@ -53,6 +53,11 @@ export default function SearchHeader({ query, setQuery, searchMode, setSearchMod
             borderRadius: 6, padding: "8px 16px", color: "rgba(201,185,154,0.5)", fontSize: 13,
             cursor: "pointer", fontFamily: "inherit", opacity: isLoading ? 0.5 : 1,
           }}>Random</button>
+          <button type="button" onClick={onOpenSets} className={styles.setsBtn} style={{
+            background: "transparent", border: "0.5px solid rgba(255,255,255,0.08)",
+            borderRadius: 6, padding: "8px 16px", color: "rgba(201,185,154,0.5)", fontSize: 13,
+            cursor: "pointer", fontFamily: "inherit",
+          }}>Sets</button>
         </div>
       </form>
     </header>

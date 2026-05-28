@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import DeckChat from "./DeckChat";
 import CardGrid from "./card/CardGrid";
+import SetBrowser from "./card/SetBrowser";
 import CardImage from "./card/CardImage";
 import CardDetail from "./card/CardDetail";
 import SearchHeader from "./layout/SearchHeader";
@@ -12,7 +13,7 @@ import MobileNav from "./nav/MobileNav";
 import useArtistHistory from "../hooks/useArtistHistory";
 import useGallery from "../hooks/useGallery";
 import useScryfall from "../hooks/useScryfall";
-import { VIEW_CARD, VIEW_SEARCH, VIEW_ARTIST, VIEW_FILTER } from "../utils/constants";
+import { VIEW_CARD, VIEW_SEARCH, VIEW_ARTIST, VIEW_FILTER, VIEW_SETS } from "../utils/constants";
 import styles from "./CardExplorer.module.css";
 
 const SIDEBAR_WIDTH = 200;
@@ -29,12 +30,14 @@ export default function CardExplorer() {
   const {
     printings, activePrinting, setActivePrinting,
     lore, loreLoading,
+    rulings, rulingsLoading,
     randomLoading, searchLoading, artistLoading, filterLoading,
     error,
     loadCard, doRandom, doSearch, openArtist, openFilter,
     searchResults, searchQuery,
     artistCards, selectedArtist,
     filterCards, filterLabel, filterSublabel,
+    sets, setsLoading, openSetBrowser,
     activeCard, lightboxImageUrl,
     isLoading,
   } = useScryfall({ addArtist, setGalleryContext, setView });
@@ -78,6 +81,7 @@ export default function CardExplorer() {
         setSearchMode={setSearchMode}
         onSearch={doSearch}
         onRandom={doRandom}
+        onOpenSets={openSetBrowser}
         isLoading={isLoading}
         onLogoClick={() => { setView(VIEW_CARD); setGalleryContext(null); }}
       />
@@ -95,6 +99,14 @@ export default function CardExplorer() {
 
         {/* Main */}
         <main style={{ flex: 1, overflowY: "auto" }}>
+
+          {view === VIEW_SETS && (
+            <SetBrowser
+              sets={sets}
+              loading={setsLoading}
+              onSelectSet={(set) => openFilter("Set", set.name, `e:${set.code}`)}
+            />
+          )}
 
           {view === VIEW_SEARCH && (
             <CardGrid
@@ -180,6 +192,8 @@ export default function CardExplorer() {
                     card={activeCard}
                     lore={lore}
                     loreLoading={loreLoading}
+                    rulings={rulings}
+                    rulingsLoading={rulingsLoading}
                     onOpenFilter={openFilter}
                     onOpenDeckChat={() => setDeckChatOpen(true)}
                   />
