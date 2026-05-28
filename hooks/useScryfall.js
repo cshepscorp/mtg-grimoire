@@ -178,7 +178,7 @@ export default function useScryfall({ addArtist, setGalleryContext, setView }) {
     setFilterCards([]);
     try {
       const res = await fetch(
-        `https://api.scryfall.com/cards/search?q=${scryfallQuery}&unique=cards&order=name`
+        `https://api.scryfall.com/cards/search?q=${encodeURIComponent(scryfallQuery)}&unique=cards&order=name`
       );
       const data = await res.json();
       setFilterCards(data.data?.filter((c) => c.image_uris) ?? []);

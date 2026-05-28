@@ -18,12 +18,12 @@ export default function SetBrowser({ sets, loading, onSelectSet }) {
   const [activeType, setActiveType] = useState("all");
 
   const visible = sets
-    .filter(s => MAIN_TYPES.has(s.set_type))
+    .filter(s => MAIN_TYPES.has(s.set_type) && s.card_count > 0)
     .filter(s => activeType === "all" || s.set_type === activeType)
     .sort((a, b) => new Date(b.released_at) - new Date(a.released_at));
 
   return (
-    <div className={styles.container} style={{ padding: "2.5rem 4rem", maxWidth: 1100, margin: "0 auto" }}>
+    <div className={styles.container} style={{ padding: "2.5rem 4rem" }}>
       <div style={{ marginBottom: "1.75rem" }}>
         <div style={{ fontSize: 22, fontWeight: 700, color: "#e8dcc8", marginBottom: 4 }}>Sets</div>
         <div style={{ fontSize: 12, color: "rgba(201,185,154,0.45)" }}>Browse cards by set</div>

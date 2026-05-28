@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import styles from "./SearchHeader.module.css";
 
-export default function SearchHeader({ query, setQuery, searchMode, setSearchMode, onSearch, onRandom, onOpenSets, isLoading, onLogoClick }) {
+export default function SearchHeader({ query, setQuery, searchMode, setSearchMode, onSearch, onRandom, onOpenSets, onOpenColors, isLoading, onLogoClick }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -81,6 +81,7 @@ export default function SearchHeader({ query, setQuery, searchMode, setSearchMod
   };
 
   const handleOpenSets = () => { onOpenSets(); setMenuOpen(false); };
+  const handleOpenColors = () => { onOpenColors(); setMenuOpen(false); };
 
   return (
     <header className={styles.header} style={{
@@ -184,6 +185,11 @@ export default function SearchHeader({ query, setQuery, searchMode, setSearchMod
             borderRadius: 6, padding: "8px 16px", color: "rgba(201,185,154,0.5)", fontSize: 13,
             cursor: "pointer", fontFamily: "inherit",
           }}>Sets</button>
+          <button type="button" onClick={handleOpenColors} className={styles.setsBtn} style={{
+            background: "transparent", border: "0.5px solid rgba(255,255,255,0.08)",
+            borderRadius: 6, padding: "8px 16px", color: "rgba(201,185,154,0.5)", fontSize: 13,
+            cursor: "pointer", fontFamily: "inherit",
+          }}>Colors</button>
         </div>
       </form>
 
@@ -194,6 +200,11 @@ export default function SearchHeader({ query, setQuery, searchMode, setSearchMod
             borderRadius: 6, padding: "10px 14px", color: "rgba(201,185,154,0.75)", fontSize: 13,
             cursor: "pointer", fontFamily: "inherit", textAlign: "left", width: "100%",
           }}>Browse Sets</button>
+          <button onClick={handleOpenColors} style={{
+            background: "transparent", border: "0.5px solid rgba(201,185,154,0.18)",
+            borderRadius: 6, padding: "10px 14px", color: "rgba(201,185,154,0.75)", fontSize: 13,
+            cursor: "pointer", fontFamily: "inherit", textAlign: "left", width: "100%",
+          }}>Browse Colors</button>
         </div>
       )}
     </header>

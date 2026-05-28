@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import DeckChat from "./DeckChat";
 import CardGrid from "./card/CardGrid";
 import SetBrowser from "./card/SetBrowser";
+import ColorBrowser from "./card/ColorBrowser";
 import CardImage from "./card/CardImage";
 import CardDetail from "./card/CardDetail";
 import SearchHeader from "./layout/SearchHeader";
@@ -13,7 +14,7 @@ import MobileNav from "./nav/MobileNav";
 import useArtistHistory from "../hooks/useArtistHistory";
 import useGallery from "../hooks/useGallery";
 import useScryfall from "../hooks/useScryfall";
-import { VIEW_CARD, VIEW_SEARCH, VIEW_ARTIST, VIEW_FILTER, VIEW_SETS } from "../utils/constants";
+import { VIEW_CARD, VIEW_SEARCH, VIEW_ARTIST, VIEW_FILTER, VIEW_SETS, VIEW_COLORS } from "../utils/constants";
 import styles from "./CardExplorer.module.css";
 
 const SIDEBAR_WIDTH = 200;
@@ -89,6 +90,7 @@ export default function CardExplorer() {
         onSearch={doSearch}
         onRandom={doRandom}
         onOpenSets={openSetBrowser}
+        onOpenColors={() => setView(VIEW_COLORS)}
         isLoading={isLoading}
         onLogoClick={() => { setView(VIEW_CARD); setGalleryContext(null); }}
       />
@@ -112,6 +114,12 @@ export default function CardExplorer() {
               sets={sets}
               loading={setsLoading}
               onSelectSet={(set) => openFilter("Set", set.name, `e:${set.code}`)}
+            />
+          )}
+
+          {view === VIEW_COLORS && (
+            <ColorBrowser
+              onSelectColor={(color) => openFilter("Color", color.name, color.query)}
             />
           )}
 
@@ -144,7 +152,7 @@ export default function CardExplorer() {
 
           {view === VIEW_CARD && (
             <>
-              <div className={styles.cardView} style={{ padding: "2.5rem 4rem", maxWidth: 860, margin: "0 auto" }}>
+              <div className={styles.cardView} style={{ padding: "2.5rem 4rem", maxWidth: 1100, margin: "0 auto" }}>
 
               {/* Back to gallery + position indicator */}
               {galleryContext && (
@@ -168,7 +176,7 @@ export default function CardExplorer() {
               {error && <div style={{ color: "#e8a27c", fontSize: 13, padding: "1rem 0" }}>{error}</div>}
 
               {!randomLoading && !searchLoading && displayCard && (
-                <div className={styles.cardGrid} style={{ display: "grid", gridTemplateColumns: "280px 1fr", gap: "2.5rem", alignItems: "start" }}>
+                <div className={styles.cardGrid} style={{ display: "grid", gridTemplateColumns: "320px 1fr", gap: "3rem", alignItems: "start" }}>
 
                   {/* Left */}
                   <div>
