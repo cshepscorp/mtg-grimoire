@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
+import DeckChat from "./DeckChat";
 
 const MANA_COLORS = {
   W: { bg: "#f9f6d2", color: "#7a6a00" },
@@ -211,6 +212,7 @@ export default function CardExplorer() {
   const [randomLoading, setRandomLoading] = useState(false);
   const [error, setError] = useState("");
   const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [deckChatOpen, setDeckChatOpen] = useState(false);
 
   const [view, setView] = useState(VIEW_CARD);
 
@@ -753,6 +755,22 @@ export default function CardExplorer() {
                         {loreLoading ? "Consulting the archives..." : lore}
                       </div>
                     </div>
+
+                    {/* Build a Deck button */}
+                    <button
+                      onClick={() => setDeckChatOpen(true)}
+                      style={{
+                        marginTop: 8, padding: "10px 16px", borderRadius: 8, width: "100%",
+                        background: "rgba(201,185,154,0.08)", border: "0.5px solid rgba(201,185,154,0.25)",
+                        color: "#c9b99a", fontSize: 13, cursor: "pointer",
+                        fontFamily: "Georgia, serif", letterSpacing: "0.05em",
+                        transition: "background 0.15s, border-color 0.15s",
+                      }}
+                      onMouseEnter={e => { e.currentTarget.style.background = "rgba(201,185,154,0.15)"; e.currentTarget.style.borderColor = "rgba(201,185,154,0.45)"; }}
+                      onMouseLeave={e => { e.currentTarget.style.background = "rgba(201,185,154,0.08)"; e.currentTarget.style.borderColor = "rgba(201,185,154,0.25)"; }}
+                    >
+                      ✦ Build a Deck Around This Card
+                    </button>
                   </div>
                 </div>
               )}
@@ -786,6 +804,13 @@ export default function CardExplorer() {
           }}>✕ Close</button>
         </div>
       )}
+
+      {/* Deck Builder chat panel */}
+      <DeckChat
+        card={activeCard}
+        isOpen={deckChatOpen}
+        onClose={() => setDeckChatOpen(false)}
+      />
     </div>
   );
 }
