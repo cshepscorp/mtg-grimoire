@@ -153,14 +153,14 @@ export default function CardExplorer() {
                 </div>
               )}
 
-              {randomLoading && (
+              {(randomLoading || searchLoading) && (
                 <div style={{ textAlign: "center", padding: "5rem", color: "rgba(201,185,154,0.35)", fontSize: 13, letterSpacing: "0.12em" }}>
                   Consulting the archives...
                 </div>
               )}
               {error && <div style={{ color: "#e8a27c", fontSize: 13, padding: "1rem 0" }}>{error}</div>}
 
-              {!randomLoading && activeCard && (
+              {!randomLoading && !searchLoading && activeCard && (
                 <div className={styles.cardGrid} style={{ display: "grid", gridTemplateColumns: "280px 1fr", gap: "2.5rem", alignItems: "start" }}>
 
                   {/* Left */}
