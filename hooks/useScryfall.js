@@ -5,6 +5,7 @@ export default function useScryfall({ addArtist, setGalleryContext, setView }) {
   const [card, setCard] = useState(null);
   const [printings, setPrintings] = useState([]);
   const [activePrinting, setActivePrinting] = useState(0);
+  const [activeFace, setActiveFace] = useState(0);
   const [lore, setLore] = useState("");
   const [loreLoading, setLoreLoading] = useState(false);
   const [rulings, setRulings] = useState([]);
@@ -60,6 +61,7 @@ export default function useScryfall({ addArtist, setGalleryContext, setView }) {
   const loadCard = useCallback(async (cardData, galleryIndex = null, galleryCards = null, galleryLabel = null) => {
     setCard(cardData);
     setActivePrinting(0);
+    setActiveFace(0);
     setError("");
     setView(VIEW_CARD);
     if (galleryIndex !== null && galleryCards !== null) {
@@ -71,7 +73,7 @@ export default function useScryfall({ addArtist, setGalleryContext, setView }) {
         `https://api.scryfall.com/cards/search?order=released&q=!"${encodeURIComponent(cardData.name)}"&unique=prints`
       );
       const data = await res.json();
-      setPrintings(data.data?.filter((p) => p.image_uris) ?? [cardData]);
+      setPrintings(data.data?.filter((p) => p.image_uris || p.card_faces?.some(f => f.image_uris)) ?? [cardData]);
     } catch {
       setPrintings([cardData]);
     }
@@ -187,12 +189,17 @@ export default function useScryfall({ addArtist, setGalleryContext, setView }) {
   useEffect(() => { doRandom(); }, []);
 
   const activeCard = printings[activePrinting] || card;
-  const cardImageUrl = activeCard?.image_uris?.normal;
-  const lightboxImageUrl = activeCard?.image_uris?.png || activeCard?.image_uris?.large || cardImageUrl;
+  const hasFaces = !!(activeCard?.card_faces?.length > 1 && !activeCard?.image_uris);
+  const displayCard = hasFaces
+    ? { ...activeCard, ...activeCard.card_faces[activeFace] }
+    : activeCard;
+  const cardImageUrl = displayCard?.image_uris?.normal;
+  const lightboxImageUrl = displayCard?.image_uris?.png || displayCard?.image_uris?.large || cardImageUrl;
   const isLoading = randomLoading || searchLoading || artistLoading || filterLoading;
 
   return {
     card, printings, activePrinting, setActivePrinting,
+    activeFace, setActiveFace, hasFaces, displayCard,
     lore, loreLoading,
     rulings, rulingsLoading,
     randomLoading, searchLoading, artistLoading, filterLoading,

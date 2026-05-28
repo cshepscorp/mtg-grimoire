@@ -1,5 +1,5 @@
 export default function PrintingThumb({ card, active, onClick }) {
-  const thumb = card.image_uris?.small;
+  const thumb = card.image_uris?.small || card.card_faces?.[0]?.image_uris?.small;
   if (!thumb) return null;
   return (
     <div onClick={onClick} style={{

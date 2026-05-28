@@ -22,6 +22,7 @@ export default function CardExplorer() {
   const [query, setQuery] = useState("");
   const [searchMode, setSearchMode] = useState("name");
   const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxRotation, setLightboxRotation] = useState(0);
   const [deckChatOpen, setDeckChatOpen] = useState(false);
   const [view, setView] = useState(VIEW_CARD);
 
@@ -29,6 +30,7 @@ export default function CardExplorer() {
   const { galleryContext, setGalleryContext, navigateGallery, goBackToGallery, canGoPrev, canGoNext } = useGallery({ setView, view });
   const {
     printings, activePrinting, setActivePrinting,
+    activeFace, setActiveFace, hasFaces, displayCard,
     lore, loreLoading,
     rulings, rulingsLoading,
     randomLoading, searchLoading, artistLoading, filterLoading,
@@ -41,6 +43,11 @@ export default function CardExplorer() {
     activeCard, lightboxImageUrl,
     isLoading,
   } = useScryfall({ addArtist, setGalleryContext, setView });
+
+  const flipTargetName = hasFaces
+    ? activeCard?.card_faces?.[activeFace === 0 ? 1 : 0]?.name
+    : null;
+  const canRotate = ["split", "flip", "aftermath", "planar", "scheme"].includes(displayCard?.layout);
 
   // Touch tracking for swipe
   const touchStartX = useRef(null);
@@ -160,18 +167,23 @@ export default function CardExplorer() {
               )}
               {error && <div style={{ color: "#e8a27c", fontSize: 13, padding: "1rem 0" }}>{error}</div>}
 
-              {!randomLoading && !searchLoading && activeCard && (
+              {!randomLoading && !searchLoading && displayCard && (
                 <div className={styles.cardGrid} style={{ display: "grid", gridTemplateColumns: "280px 1fr", gap: "2.5rem", alignItems: "start" }}>
 
                   {/* Left */}
                   <div>
                     <CardImage
-                      card={activeCard}
+                      card={displayCard}
                       printings={printings}
                       activePrinting={activePrinting}
                       onPrintingChange={setActivePrinting}
                       onOpenArtist={openArtist}
-                      onLightboxOpen={() => setLightboxOpen(true)}
+                      onLightboxOpen={() => { setLightboxRotation(0); setLightboxOpen(true); }}
+                      onRotateOpen={() => { setLightboxRotation(90); setLightboxOpen(true); }}
+                      canRotate={canRotate}
+                      hasFaces={hasFaces}
+                      flipTargetName={flipTargetName}
+                      onFlipFace={() => setActiveFace(f => f === 0 ? 1 : 0)}
                     />
 
                     {/* Mobile prev/next */}
@@ -189,7 +201,7 @@ export default function CardExplorer() {
 
                   {/* Right */}
                   <CardDetail
-                    card={activeCard}
+                    card={displayCard}
                     lore={lore}
                     loreLoading={loreLoading}
                     rulings={rulings}
@@ -217,16 +229,39 @@ export default function CardExplorer() {
           display: "flex", alignItems: "center", justifyContent: "center",
           cursor: "zoom-out", backdropFilter: "blur(4px)",
         }}>
-          <img src={lightboxImageUrl} alt={activeCard?.name} onClick={e => e.stopPropagation()} style={{
-            maxHeight: "90vh", maxWidth: "90vw",
-            borderRadius: 16, boxShadow: "0 32px 80px rgba(0,0,0,0.8)", cursor: "default",
-          }} />
-          <button onClick={() => setLightboxOpen(false)} style={{
-            position: "fixed", top: 24, right: 24,
-            background: "rgba(201,185,154,0.1)", border: "0.5px solid rgba(201,185,154,0.25)",
-            borderRadius: 6, padding: "6px 14px", color: "rgba(201,185,154,0.6)",
-            fontSize: 12, cursor: "pointer", fontFamily: "inherit",
-          }}>✕ Close</button>
+          <img
+            src={lightboxImageUrl}
+            alt={displayCard?.name}
+            onClick={e => e.stopPropagation()}
+            style={{
+              maxHeight: lightboxRotation % 180 !== 0 ? "90vw" : "90vh",
+              maxWidth: lightboxRotation % 180 !== 0 ? "90vh" : "90vw",
+              borderRadius: 16, boxShadow: "0 32px 80px rgba(0,0,0,0.8)", cursor: "default",
+              transform: `rotate(${lightboxRotation}deg)`,
+              transition: "transform 0.3s ease",
+            }}
+          />
+          <div onClick={e => e.stopPropagation()} style={{ position: "fixed", top: 24, right: 24, display: "flex", gap: 8 }}>
+            {hasFaces && (
+              <button onClick={() => setActiveFace(f => f === 0 ? 1 : 0)} style={{
+                background: "rgba(201,185,154,0.1)", border: "0.5px solid rgba(201,185,154,0.25)",
+                borderRadius: 6, padding: "6px 14px", color: "rgba(201,185,154,0.6)",
+                fontSize: 12, cursor: "pointer", fontFamily: "inherit",
+              }}>↺ {flipTargetName}</button>
+            )}
+            {canRotate && (
+              <button onClick={() => setLightboxRotation(r => r + 90)} style={{
+                background: "rgba(201,185,154,0.1)", border: "0.5px solid rgba(201,185,154,0.25)",
+                borderRadius: 6, padding: "6px 14px", color: "rgba(201,185,154,0.6)",
+                fontSize: 12, cursor: "pointer", fontFamily: "inherit",
+              }}>↻ Rotate</button>
+            )}
+            <button onClick={() => setLightboxOpen(false)} style={{
+              background: "rgba(201,185,154,0.1)", border: "0.5px solid rgba(201,185,154,0.25)",
+              borderRadius: 6, padding: "6px 14px", color: "rgba(201,185,154,0.6)",
+              fontSize: 12, cursor: "pointer", fontFamily: "inherit",
+            }}>✕ Close</button>
+          </div>
         </div>
       )}
 

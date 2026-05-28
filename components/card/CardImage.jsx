@@ -1,6 +1,8 @@
+"use client";
+
 import PrintingThumb from "./PrintingThumb";
 
-export default function CardImage({ card, printings, activePrinting, onPrintingChange, onOpenArtist, onLightboxOpen }) {
+export default function CardImage({ card, printings, activePrinting, onPrintingChange, onOpenArtist, onLightboxOpen, onRotateOpen, canRotate, hasFaces, flipTargetName, onFlipFace }) {
   const cardImageUrl = card?.image_uris?.normal;
 
   return (
@@ -23,6 +25,44 @@ export default function CardImage({ card, printings, activePrinting, onPrintingC
           : <span style={{ color: "rgba(201,185,154,0.25)", fontSize: 13 }}>No image</span>
         }
       </div>
+
+      {canRotate && (
+        <button
+          onClick={onRotateOpen}
+          style={{
+            marginTop: 10, width: "100%",
+            background: "rgba(201,185,154,0.06)", border: "0.5px solid rgba(201,185,154,0.25)",
+            borderRadius: 8, padding: "10px 16px",
+            color: "#c9b99a", fontSize: 13,
+            cursor: "pointer", fontFamily: "Georgia, serif",
+            letterSpacing: "0.05em", textAlign: "center",
+            transition: "background 0.15s, border-color 0.15s",
+          }}
+          onMouseEnter={e => { e.currentTarget.style.background = "rgba(201,185,154,0.14)"; e.currentTarget.style.borderColor = "rgba(201,185,154,0.45)"; }}
+          onMouseLeave={e => { e.currentTarget.style.background = "rgba(201,185,154,0.06)"; e.currentTarget.style.borderColor = "rgba(201,185,154,0.25)"; }}
+        >
+          ↻ Rotate to Read
+        </button>
+      )}
+
+      {hasFaces && (
+        <button
+          onClick={onFlipFace}
+          style={{
+            marginTop: 10, width: "100%",
+            background: "rgba(201,185,154,0.06)", border: "0.5px solid rgba(201,185,154,0.25)",
+            borderRadius: 8, padding: "10px 16px",
+            color: "#c9b99a", fontSize: 13,
+            cursor: "pointer", fontFamily: "Georgia, serif",
+            letterSpacing: "0.05em", textAlign: "center",
+            transition: "background 0.15s, border-color 0.15s",
+          }}
+          onMouseEnter={e => { e.currentTarget.style.background = "rgba(201,185,154,0.14)"; e.currentTarget.style.borderColor = "rgba(201,185,154,0.45)"; }}
+          onMouseLeave={e => { e.currentTarget.style.background = "rgba(201,185,154,0.06)"; e.currentTarget.style.borderColor = "rgba(201,185,154,0.25)"; }}
+        >
+          ↺ {flipTargetName}
+        </button>
+      )}
 
       {card?.artist && (
         <div style={{ marginTop: 10, fontSize: 11, color: "rgba(201,185,154,0.5)", letterSpacing: "0.06em", textAlign: "center" }}>
