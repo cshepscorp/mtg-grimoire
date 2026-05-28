@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import SetTile from "./SetTile";
+import styles from "./SetBrowser.module.css";
 
 const MAIN_TYPES = new Set(["core", "expansion", "masters", "draft_innovation", "commander", "funny"]);
 
@@ -22,7 +23,7 @@ export default function SetBrowser({ sets, loading, onSelectSet }) {
     .sort((a, b) => new Date(b.released_at) - new Date(a.released_at));
 
   return (
-    <div style={{ padding: "2.5rem 4rem", maxWidth: 1100, margin: "0 auto" }}>
+    <div className={styles.container} style={{ padding: "2.5rem 4rem", maxWidth: 1100, margin: "0 auto" }}>
       <div style={{ marginBottom: "1.75rem" }}>
         <div style={{ fontSize: 22, fontWeight: 700, color: "#e8dcc8", marginBottom: 4 }}>Sets</div>
         <div style={{ fontSize: 12, color: "rgba(201,185,154,0.45)" }}>Browse cards by set</div>

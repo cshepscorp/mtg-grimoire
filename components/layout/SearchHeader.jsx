@@ -1,6 +1,13 @@
+"use client";
+
+import { useState } from "react";
 import styles from "./SearchHeader.module.css";
 
 export default function SearchHeader({ query, setQuery, searchMode, setSearchMode, onSearch, onRandom, onOpenSets, isLoading, onLogoClick }) {
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const handleOpenSets = () => { onOpenSets(); setMenuOpen(false); };
+
   return (
     <header className={styles.header} style={{
       borderBottom: "0.5px solid rgba(201,185,154,0.15)",
@@ -13,12 +20,21 @@ export default function SearchHeader({ query, setQuery, searchMode, setSearchMod
           <div style={{ fontSize: 20, fontWeight: 700, letterSpacing: "0.14em", color: "#c9b99a", textTransform: "uppercase" }}>Grimoire</div>
           <div className={styles.headerSubtitle} style={{ fontSize: 10, color: "rgba(201,185,154,0.4)", letterSpacing: "0.2em", textTransform: "uppercase", marginTop: 2 }}>Magic: The Gathering Explorer</div>
         </div>
-        <button type="button" onClick={onRandom} disabled={isLoading} className={styles.randomBtn} style={{
-          background: "transparent", border: "0.5px solid rgba(255,255,255,0.08)",
-          borderRadius: 6, padding: "8px 16px", color: "rgba(201,185,154,0.5)", fontSize: 13,
-          cursor: "pointer", fontFamily: "inherit", opacity: isLoading ? 0.5 : 1,
-        }}>Random</button>
+        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          <button type="button" onClick={onRandom} disabled={isLoading} className={styles.randomBtn} style={{
+            background: "transparent", border: "0.5px solid rgba(255,255,255,0.08)",
+            borderRadius: 6, padding: "8px 16px", color: "rgba(201,185,154,0.5)", fontSize: 13,
+            cursor: "pointer", fontFamily: "inherit", opacity: isLoading ? 0.5 : 1,
+          }}>Random</button>
+          <button type="button" onClick={() => setMenuOpen(o => !o)} className={styles.hamburger} style={{
+            background: menuOpen ? "rgba(201,185,154,0.1)" : "transparent",
+            border: "0.5px solid rgba(201,185,154,0.2)",
+            borderRadius: 6, padding: "6px 10px", color: "rgba(201,185,154,0.6)", fontSize: 16,
+            cursor: "pointer", fontFamily: "inherit", lineHeight: 1,
+          }}>≡</button>
+        </div>
       </div>
+
       <form onSubmit={(e) => { e.preventDefault(); onSearch(query, searchMode); }} className={styles.headerForm} style={{ display: "flex", gap: 8, alignItems: "center" }}>
         <input
           value={query}
@@ -53,13 +69,23 @@ export default function SearchHeader({ query, setQuery, searchMode, setSearchMod
             borderRadius: 6, padding: "8px 16px", color: "rgba(201,185,154,0.5)", fontSize: 13,
             cursor: "pointer", fontFamily: "inherit", opacity: isLoading ? 0.5 : 1,
           }}>Random</button>
-          <button type="button" onClick={onOpenSets} className={styles.setsBtn} style={{
+          <button type="button" onClick={handleOpenSets} className={styles.setsBtn} style={{
             background: "transparent", border: "0.5px solid rgba(255,255,255,0.08)",
             borderRadius: 6, padding: "8px 16px", color: "rgba(201,185,154,0.5)", fontSize: 13,
             cursor: "pointer", fontFamily: "inherit",
           }}>Sets</button>
         </div>
       </form>
+
+      {menuOpen && (
+        <div className={styles.mobileDropdown}>
+          <button onClick={handleOpenSets} style={{
+            background: "transparent", border: "0.5px solid rgba(201,185,154,0.18)",
+            borderRadius: 6, padding: "10px 14px", color: "rgba(201,185,154,0.75)", fontSize: 13,
+            cursor: "pointer", fontFamily: "inherit", textAlign: "left", width: "100%",
+          }}>Browse Sets</button>
+        </div>
+      )}
     </header>
   );
 }

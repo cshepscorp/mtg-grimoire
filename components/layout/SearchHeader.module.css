@@ -39,6 +39,18 @@
   .setsBtn {
     display: none !important;
   }
+  .hamburger {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .mobileDropdown {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding-top: 6px;
+    border-top: 0.5px solid rgba(201,185,154,0.1);
+  }
 }
 
 @media (min-width: 641px) {
@@ -49,6 +61,12 @@
     display: contents;
   }
   .randomBtn {
+    display: none !important;
+  }
+  .hamburger {
+    display: none !important;
+  }
+  .mobileDropdown {
     display: none !important;
   }
 }
