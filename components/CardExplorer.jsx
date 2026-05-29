@@ -12,9 +12,10 @@ import ArtistSidebar from "./layout/ArtistSidebar";
 import NavArrow from "./nav/NavArrow";
 import MobileNav from "./nav/MobileNav";
 import useArtistHistory from "../hooks/useArtistHistory";
+import useFavorites from "../hooks/useFavorites";
 import useGallery from "../hooks/useGallery";
 import useScryfall from "../hooks/useScryfall";
-import { VIEW_CARD, VIEW_SEARCH, VIEW_ARTIST, VIEW_FILTER, VIEW_SETS, VIEW_COLORS } from "../utils/constants";
+import { VIEW_CARD, VIEW_SEARCH, VIEW_ARTIST, VIEW_FILTER, VIEW_SETS, VIEW_COLORS, VIEW_FAVORITES } from "../utils/constants";
 import styles from "./CardExplorer.module.css";
 
 const SIDEBAR_WIDTH = 200;
@@ -28,6 +29,7 @@ export default function CardExplorer() {
   const [view, setView] = useState(VIEW_CARD);
 
   const { artists, addArtist, clearArtists } = useArtistHistory();
+  const { favorites, isFavorite, toggleFavorite } = useFavorites();
   const { galleryContext, setGalleryContext, navigateGallery, goBackToGallery, canGoPrev, canGoNext } = useGallery({ setView, view });
   const {
     printings, activePrinting, setActivePrinting,
@@ -91,6 +93,8 @@ export default function CardExplorer() {
         onRandom={doRandom}
         onOpenSets={openSetBrowser}
         onOpenColors={() => setView(VIEW_COLORS)}
+        onOpenFavorites={() => setView(VIEW_FAVORITES)}
+        favoritesCount={favorites.length}
         isLoading={isLoading}
         onLogoClick={() => { setView(VIEW_CARD); setGalleryContext(null); }}
       />
@@ -108,6 +112,18 @@ export default function CardExplorer() {
 
         {/* Main */}
         <main style={{ flex: 1, overflowY: "auto" }}>
+
+          {view === VIEW_FAVORITES && (
+            <CardGrid
+              cards={favorites}
+              label="Favorites"
+              sublabel={favorites.length === 0 ? "No favorites yet" : `${favorites.length} card${favorites.length === 1 ? "" : "s"}`}
+              loading={false}
+              loadingText=""
+              onSelectCard={(c, i) => loadCard(c, i, favorites, VIEW_FAVORITES)}
+              onBack={() => setView(VIEW_FAVORITES)}
+            />
+          )}
 
           {view === VIEW_SETS && (
             <SetBrowser
@@ -189,6 +205,8 @@ export default function CardExplorer() {
                       onLightboxOpen={() => { setLightboxRotation(0); setLightboxOpen(true); }}
                       onRotateOpen={() => { setLightboxRotation(90); setLightboxOpen(true); }}
                       canRotate={canRotate}
+                      isFavorite={isFavorite(activeCard?.id)}
+                      onToggleFavorite={() => toggleFavorite(activeCard)}
                       hasFaces={hasFaces}
                       flipTargetName={flipTargetName}
                       onFlipFace={() => setActiveFace(f => f === 0 ? 1 : 0)}

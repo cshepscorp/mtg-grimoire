@@ -2,7 +2,7 @@
 
 import PrintingThumb from "./PrintingThumb";
 
-export default function CardImage({ card, printings, activePrinting, onPrintingChange, onOpenArtist, onLightboxOpen, onRotateOpen, canRotate, hasFaces, flipTargetName, onFlipFace }) {
+export default function CardImage({ card, printings, activePrinting, onPrintingChange, onOpenArtist, onLightboxOpen, onRotateOpen, canRotate, hasFaces, flipTargetName, onFlipFace, isFavorite, onToggleFavorite }) {
   const cardImageUrl = card?.image_uris?.normal;
 
   return (
@@ -63,6 +63,24 @@ export default function CardImage({ card, printings, activePrinting, onPrintingC
           ↺ {flipTargetName}
         </button>
       )}
+
+      <button
+        onClick={onToggleFavorite}
+        style={{
+          marginTop: 10, width: "100%",
+          background: isFavorite ? "rgba(232,162,124,0.1)" : "rgba(201,185,154,0.06)",
+          border: `0.5px solid ${isFavorite ? "rgba(232,162,124,0.4)" : "rgba(201,185,154,0.25)"}`,
+          borderRadius: 8, padding: "10px 16px",
+          color: isFavorite ? "#e8a27c" : "#c9b99a", fontSize: 13,
+          cursor: "pointer", fontFamily: "Georgia, serif",
+          letterSpacing: "0.05em", textAlign: "center",
+          transition: "background 0.15s, border-color 0.15s, color 0.15s",
+        }}
+        onMouseEnter={e => { e.currentTarget.style.background = isFavorite ? "rgba(232,162,124,0.18)" : "rgba(201,185,154,0.14)"; }}
+        onMouseLeave={e => { e.currentTarget.style.background = isFavorite ? "rgba(232,162,124,0.1)" : "rgba(201,185,154,0.06)"; }}
+      >
+        {isFavorite ? "♥ Saved" : "♡ Save to Favorites"}
+      </button>
 
       {card?.artist && (
         <div style={{ marginTop: 10, fontSize: 11, color: "rgba(201,185,154,0.5)", letterSpacing: "0.06em", textAlign: "center" }}>
