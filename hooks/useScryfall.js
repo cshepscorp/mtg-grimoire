@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { VIEW_CARD, VIEW_SEARCH, VIEW_ARTIST, VIEW_FILTER, VIEW_SETS } from "../utils/constants";
 import { checkLimit, incrementUsage } from "../utils/rateLimit";
 
-export default function useScryfall({ addArtist, setGalleryContext, setView }) {
+export default function useScryfall({ setGalleryContext, setView }) {
   const [card, setCard] = useState(null);
   const [printings, setPrintings] = useState([]);
   const [activePrinting, setActivePrinting] = useState(0);
@@ -100,7 +100,6 @@ export default function useScryfall({ addArtist, setGalleryContext, setView }) {
   }, [loadCard, setGalleryContext]);
 
   const openArtist = useCallback(async (artistName) => {
-    addArtist(artistName);
     setSelectedArtist(artistName);
     setView(VIEW_ARTIST);
     setArtistLoading(true);

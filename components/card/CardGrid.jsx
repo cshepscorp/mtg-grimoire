@@ -1,10 +1,13 @@
-export default function CardGrid({ cards, label, sublabel, loading, loadingText, onSelectCard, onBack }) {
+export default function CardGrid({ cards, label, sublabel, loading, loadingText, onSelectCard, onBack, headerAction }) {
   return (
     <div style={{ padding: "2rem" }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1.5rem" }}>
-        <div>
-          <div style={{ fontSize: 10, color: "rgba(201,185,154,0.5)", letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: 4 }}>{label}</div>
-          <div style={{ fontSize: 22, fontWeight: 700, color: "#e8dcc8" }}>{sublabel}</div>
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <div>
+            <div style={{ fontSize: 10, color: "rgba(201,185,154,0.5)", letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: 4 }}>{label}</div>
+            <div style={{ fontSize: 22, fontWeight: 700, color: "#e8dcc8" }}>{sublabel}</div>
+          </div>
+          {headerAction}
         </div>
         <button onClick={onBack} style={{
           background: "transparent", border: "0.5px solid rgba(201,185,154,0.3)",

@@ -2,7 +2,7 @@
 
 import PrintingThumb from "./PrintingThumb";
 
-export default function CardImage({ card, printings, activePrinting, onPrintingChange, onOpenArtist, onLightboxOpen, onRotateOpen, canRotate, hasFaces, flipTargetName, onFlipFace, isFavorite, onToggleFavorite }) {
+export default function CardImage({ card, printings, activePrinting, onPrintingChange, onOpenArtist, onLightboxOpen, onRotateOpen, canRotate, hasFaces, flipTargetName, onFlipFace, isFavorite, onToggleFavorite, isArtistFavorite, onToggleFavoriteArtist }) {
   const cardImageUrl = card?.image_uris?.normal;
 
   return (
@@ -83,11 +83,27 @@ export default function CardImage({ card, printings, activePrinting, onPrintingC
       </button>
 
       {card?.artist && (
-        <div style={{ marginTop: 10, fontSize: 11, color: "rgba(201,185,154,0.5)", letterSpacing: "0.06em", textAlign: "center" }}>
-          Art by{" "}
-          <span onClick={() => onOpenArtist(card.artist)} style={{ color: "#c9b99a", cursor: "pointer", textDecoration: "underline", textDecorationColor: "rgba(201,185,154,0.3)" }}>
-            {card.artist}
+        <div style={{ marginTop: 10, fontSize: 11, color: "rgba(201,185,154,0.5)", letterSpacing: "0.06em", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
+          <span>
+            Art by{" "}
+            <span onClick={() => onOpenArtist(card.artist)} style={{ color: "#c9b99a", cursor: "pointer", textDecoration: "underline", textDecorationColor: "rgba(201,185,154,0.3)" }}>
+              {card.artist}
+            </span>
           </span>
+          <button
+            onClick={() => onToggleFavoriteArtist(card.artist)}
+            title={isArtistFavorite ? "Remove from favorites" : "Favorite this artist"}
+            style={{
+              background: "rgba(201,185,154,0.08)",
+              border: `0.5px solid ${isArtistFavorite ? "rgba(232,162,124,0.4)" : "rgba(201,185,154,0.25)"}`,
+              borderRadius: 4, cursor: "pointer", padding: "2px 6px",
+              fontSize: 12, lineHeight: 1,
+              color: isArtistFavorite ? "#e8a27c" : "rgba(201,185,154,0.6)",
+              transition: "color 0.15s, border-color 0.15s",
+            }}
+          >
+            {isArtistFavorite ? "♥" : "♡"}
+          </button>
         </div>
       )}
 

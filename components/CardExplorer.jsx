@@ -11,7 +11,7 @@ import SearchHeader from "./layout/SearchHeader";
 import ArtistSidebar from "./layout/ArtistSidebar";
 import NavArrow from "./nav/NavArrow";
 import MobileNav from "./nav/MobileNav";
-import useArtistHistory from "../hooks/useArtistHistory";
+import useFavoriteArtists from "../hooks/useFavoriteArtists";
 import useFavorites from "../hooks/useFavorites";
 import useGallery from "../hooks/useGallery";
 import useScryfall from "../hooks/useScryfall";
@@ -28,10 +28,11 @@ export default function CardExplorer() {
   const [deckChatOpen, setDeckChatOpen] = useState(false);
   const [view, setView] = useState(VIEW_CARD);
 
-  const { artists, addArtist, clearArtists } = useArtistHistory();
+  const { favoriteArtists, toggleFavoriteArtist, isArtistFavorite, clearFavoriteArtists } = useFavoriteArtists();
   const { favorites, isFavorite, toggleFavorite } = useFavorites();
   const { galleryContext, setGalleryContext, navigateGallery, goBackToGallery, canGoPrev, canGoNext } = useGallery({ setView, view });
   const {
+
     printings, activePrinting, setActivePrinting,
     activeFace, setActiveFace, hasFaces, displayCard,
     lore, loreLoading,
@@ -45,7 +46,7 @@ export default function CardExplorer() {
     sets, setsLoading, openSetBrowser,
     activeCard, lightboxImageUrl,
     isLoading,
-  } = useScryfall({ addArtist, setGalleryContext, setView });
+  } = useScryfall({ setGalleryContext, setView });
 
   const flipTargetName = hasFaces
     ? activeCard?.card_faces?.[activeFace === 0 ? 1 : 0]?.name
@@ -103,11 +104,12 @@ export default function CardExplorer() {
       <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
 
         <ArtistSidebar
-          artists={artists}
+          artists={favoriteArtists}
           selectedArtist={selectedArtist}
           currentView={view}
           onSelectArtist={openArtist}
-          onClear={clearArtists}
+          onRemoveArtist={toggleFavoriteArtist}
+          onClear={clearFavoriteArtists}
         />
 
         {/* Main */}
@@ -154,6 +156,21 @@ export default function CardExplorer() {
               loading={artistLoading} loadingText="Gathering works..."
               onSelectCard={(c, i) => loadCard(c, i, artistCards, VIEW_ARTIST)}
               onBack={() => setView(VIEW_ARTIST)}
+              headerAction={selectedArtist && (
+                <button
+                  onClick={() => toggleFavoriteArtist(selectedArtist)}
+                  style={{
+                    background: isArtistFavorite(selectedArtist) ? "rgba(232,162,124,0.1)" : "rgba(201,185,154,0.06)",
+                    border: `0.5px solid ${isArtistFavorite(selectedArtist) ? "rgba(232,162,124,0.4)" : "rgba(201,185,154,0.25)"}`,
+                    borderRadius: 6, padding: "6px 12px",
+                    color: isArtistFavorite(selectedArtist) ? "#e8a27c" : "rgba(201,185,154,0.6)",
+                    fontSize: 12, cursor: "pointer", fontFamily: "inherit",
+                    transition: "all 0.15s",
+                  }}
+                >
+                  {isArtistFavorite(selectedArtist) ? "♥ Favorited" : "♡ Favorite Artist"}
+                </button>
+              )}
             />
           )}
 
@@ -207,6 +224,8 @@ export default function CardExplorer() {
                       canRotate={canRotate}
                       isFavorite={isFavorite(activeCard?.id)}
                       onToggleFavorite={() => toggleFavorite(activeCard)}
+                      isArtistFavorite={isArtistFavorite(displayCard?.artist)}
+                      onToggleFavoriteArtist={toggleFavoriteArtist}
                       hasFaces={hasFaces}
                       flipTargetName={flipTargetName}
                       onFlipFace={() => setActiveFace(f => f === 0 ? 1 : 0)}
