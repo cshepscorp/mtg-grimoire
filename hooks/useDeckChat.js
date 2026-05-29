@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { parseDeckJson, deduplicateDeck } from "../utils/deckUtils";
+import { checkLimit, incrementUsage } from "../utils/rateLimit";
 
 const CATEGORY_ORDER = ["Creatures", "Spells", "Artifacts", "Enchantments", "Planeswalkers", "Lands"];
 
@@ -45,6 +46,12 @@ export default function useDeckChat({ card, isOpen }) {
   };
 
   const handleStart = async () => {
+    if (!checkLimit("chat")) {
+      setPhase("chat");
+      setMessages([{ role: "assistant", content: "You've reached today's deck building limit. The forge closes at midnight — return then to continue building." }]);
+      return;
+    }
+    incrementUsage("chat");
     setPhase("chat");
     setLoading(true);
     const openingMessage = {

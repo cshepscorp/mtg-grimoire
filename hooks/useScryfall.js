@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { VIEW_CARD, VIEW_SEARCH, VIEW_ARTIST, VIEW_FILTER, VIEW_SETS } from "../utils/constants";
+import { checkLimit, incrementUsage } from "../utils/rateLimit";
 
 export default function useScryfall({ addArtist, setGalleryContext, setView }) {
   const [card, setCard] = useState(null);
@@ -31,6 +32,10 @@ export default function useScryfall({ addArtist, setGalleryContext, setView }) {
   const setsFetchedRef = useRef(false);
 
   const fetchLore = useCallback(async (cardData) => {
+    if (!checkLimit("lore")) {
+      setLore("The archives have reached their daily limit. Return tomorrow for more lore.");
+      return;
+    }
     setLoreLoading(true);
     setLore("");
     try {
@@ -41,6 +46,7 @@ export default function useScryfall({ addArtist, setGalleryContext, setView }) {
       });
       const data = await res.json();
       setLore(data.lore || "The archives are silent on this matter.");
+      incrementUsage("lore");
     } catch {
       setLore("The archives are currently inaccessible.");
     }

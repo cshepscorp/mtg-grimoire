@@ -1,7 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
 
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-
 function stripMarkdown(text) {
   return text
     .replace(/\*\*(.*?)\*\*/g, "$1")
@@ -16,11 +14,15 @@ export async function POST(request) {
     return Response.json({ message: "[Chat disabled in dev mode]" });
   }
 
+  const client = new Anthropic();
+
   try {
     const { messages, card, config } = await request.json();
     const { format, rarities, budget, playstyle, isCommander } = config;
 
-    const systemPrompt = `You are an expert Magic: The Gathering deck builder. The user wants to build a deck around "${card.name}" (${card.type_line}).
+    const systemPrompt = `You are an expert Magic: The Gathering deck builder assistant. You only discuss topics related to Magic: The Gathering — cards, deck building, rules, strategy, formats, and lore. If asked anything unrelated to MTG, politely decline and redirect the conversation back to deck building.
+
+You are helping build a deck around "${card.name}" (${card.type_line}).
 
 Card details:
 - Oracle text: ${card.oracle_text || "None"}
@@ -47,7 +49,7 @@ When presenting a complete deck list, format it as a JSON code block:
 \`\`\`
 
 CRITICAL rules for the JSON:
-- Combine duplicate cards into a single entry with the correct quantity. NEVER list the same card multiple times. For example, use { "quantity": 29, "name": "Mountain", "category": "Lands" } NOT 29 separate Mountain entries.
+- Combine duplicate cards into a single entry with the correct quantity. NEVER list the same card multiple times.
 - Categories must be one of: Creatures, Spells, Artifacts, Enchantments, Planeswalkers, Lands.
 - Total card count must be exactly ${isCommander ? "99" : "60"}.
 - Include ${isCommander ? "36-38" : "20-24"} lands.
@@ -60,7 +62,7 @@ For follow-up questions or tweaks, respond conversationally in plain prose. Only
 You don't have access to real-time prices or current ban lists — say so if asked.`;
 
     const response = await client.messages.create({
-      model: "claude-sonnet-4-20250514",
+      model: "claude-sonnet-4-6",
       max_tokens: 4000,
       system: systemPrompt,
       messages,
@@ -68,14 +70,12 @@ You don't have access to real-time prices or current ban lists — say so if ask
 
     const raw = response.content.find((b) => b.type === "text")?.text || "";
 
-    // Strip markdown from prose portions only — preserve the JSON block intact
     const jsonMatch = raw.match(/(```json[\s\S]*?```)/);
     if (jsonMatch) {
       const jsonBlock = jsonMatch[1];
       const prose = raw.replace(jsonBlock, "%%JSON%%");
       const cleanProse = stripMarkdown(prose);
-      const final = cleanProse.replace("%%JSON%%", jsonBlock);
-      return Response.json({ message: final });
+      return Response.json({ message: cleanProse.replace("%%JSON%%", jsonBlock) });
     }
 
     return Response.json({ message: stripMarkdown(raw) });
