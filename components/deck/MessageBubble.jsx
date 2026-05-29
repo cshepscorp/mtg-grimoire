@@ -3,7 +3,7 @@
 import { parseDeckJson } from "../../utils/deckUtils";
 import DeckList from "./DeckList";
 
-export default function MessageBubble({ msg, onCopy, copied }) {
+export default function MessageBubble({ msg, onCopy, copied, onSaveDeck }) {
   const deckData = msg.role === "assistant" ? parseDeckJson(msg.content) : null;
 
   // Strip the json block from prose if deck was parsed
@@ -31,7 +31,7 @@ export default function MessageBubble({ msg, onCopy, copied }) {
               {prose}
             </div>
           )}
-          {deckData && <DeckList deckData={deckData} onCopy={onCopy} copied={copied} />}
+          {deckData && <DeckList deckData={deckData} onCopy={onCopy} copied={copied} onSaveDeck={onSaveDeck} />}
         </div>
       )}
     </div>

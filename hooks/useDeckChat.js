@@ -4,7 +4,7 @@ import { checkLimit, incrementUsage } from "../utils/rateLimit";
 
 const CATEGORY_ORDER = ["Creatures", "Spells", "Artifacts", "Enchantments", "Planeswalkers", "Lands"];
 
-export default function useDeckChat({ card, isOpen }) {
+export default function useDeckChat({ card, isOpen, onSaveDeck }) {
   const [phase, setPhase] = useState("config");
   const [config, setConfig] = useState({
     format: "Modern",
@@ -116,6 +116,16 @@ export default function useDeckChat({ card, isOpen }) {
     });
   };
 
+  const handleSaveDeck = (deckData) => {
+    onSaveDeck?.({
+      name: deckData.deckName,
+      description: deckData.description,
+      format: config.isCommander ? "Commander" : config.format,
+      sourceCard: card?.name,
+      cards: deduplicateDeck(deckData.cards),
+    });
+  };
+
   return {
     phase, config, setConfig,
     messages,
@@ -123,6 +133,6 @@ export default function useDeckChat({ card, isOpen }) {
     loading, copied,
     showClearConfirm, setShowClearConfirm,
     bottomRef, inputRef,
-    handleClear, handleStart, handleSend, handleCopy,
+    handleClear, handleStart, handleSend, handleCopy, handleSaveDeck,
   };
 }

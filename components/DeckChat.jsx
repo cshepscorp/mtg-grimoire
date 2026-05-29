@@ -5,7 +5,7 @@ import ConfigPanel from "./deck/ConfigPanel";
 import MessageBubble from "./deck/MessageBubble";
 import ChatInput from "./deck/ChatInput";
 
-export default function DeckChat({ card, isOpen, onClose }) {
+export default function DeckChat({ card, isOpen, onClose, onSaveDeck }) {
   const {
     phase, config, setConfig,
     messages,
@@ -13,8 +13,8 @@ export default function DeckChat({ card, isOpen, onClose }) {
     loading, copied,
     showClearConfirm, setShowClearConfirm,
     bottomRef, inputRef,
-    handleClear, handleStart, handleSend, handleCopy,
-  } = useDeckChat({ card, isOpen });
+    handleClear, handleStart, handleSend, handleCopy, handleSaveDeck,
+  } = useDeckChat({ card, isOpen, onSaveDeck });
 
   if (!card) return null;
 
@@ -105,7 +105,7 @@ export default function DeckChat({ card, isOpen, onClose }) {
           <>
             <div style={{ flex: 1, overflowY: "auto", padding: "1.25rem" }}>
               {messages.map((msg, i) => (
-                <MessageBubble key={i} msg={msg} onCopy={handleCopy} copied={copied} />
+                <MessageBubble key={i} msg={msg} onCopy={handleCopy} copied={copied} onSaveDeck={handleSaveDeck} />
               ))}
               {loading && (
                 <div style={{ fontSize: 12, color: "rgba(201,185,154,0.35)", fontStyle: "italic" }}>

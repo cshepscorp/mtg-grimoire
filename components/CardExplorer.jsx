@@ -8,17 +8,17 @@ import ColorBrowser from "./card/ColorBrowser";
 import CardImage from "./card/CardImage";
 import CardDetail from "./card/CardDetail";
 import SearchHeader from "./layout/SearchHeader";
-import ArtistSidebar from "./layout/ArtistSidebar";
+import SavedSidebar from "./layout/SavedSidebar";
 import NavArrow from "./nav/NavArrow";
 import MobileNav from "./nav/MobileNav";
 import useFavoriteArtists from "../hooks/useFavoriteArtists";
 import useFavorites from "../hooks/useFavorites";
+import useCollection from "../hooks/useCollection";
+import useDecks from "../hooks/useDecks";
 import useGallery from "../hooks/useGallery";
 import useScryfall from "../hooks/useScryfall";
 import { VIEW_CARD, VIEW_SEARCH, VIEW_ARTIST, VIEW_FILTER, VIEW_SETS, VIEW_COLORS, VIEW_FAVORITES } from "../utils/constants";
 import styles from "./CardExplorer.module.css";
-
-const SIDEBAR_WIDTH = 200;
 
 export default function CardExplorer() {
   const [query, setQuery] = useState("");
@@ -26,10 +26,14 @@ export default function CardExplorer() {
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxRotation, setLightboxRotation] = useState(0);
   const [deckChatOpen, setDeckChatOpen] = useState(false);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [view, setView] = useState(VIEW_CARD);
+  const [sidebarWidth, setSidebarWidth] = useState(260);
 
   const { favoriteArtists, toggleFavoriteArtist, isArtistFavorite, clearFavoriteArtists } = useFavoriteArtists();
-  const { favorites, isFavorite, toggleFavorite } = useFavorites();
+  const { favorites, isFavorite, toggleFavorite, removeFavorite } = useFavorites();
+  const { collection, addToCollection, removeFromCollection, updateQuantity, isOwned } = useCollection();
+  const { decks, saveDeck, deleteDeck } = useDecks();
   const { galleryContext, setGalleryContext, navigateGallery, goBackToGallery, canGoPrev, canGoNext } = useGallery({ setView, view });
   const {
 
@@ -95,7 +99,7 @@ export default function CardExplorer() {
         onOpenSets={openSetBrowser}
         onOpenColors={() => setView(VIEW_COLORS)}
         onOpenFavorites={() => setView(VIEW_FAVORITES)}
-        favoritesCount={favorites.length}
+        onOpenMySaved={() => setMobileSidebarOpen(true)}
         isLoading={isLoading}
         onLogoClick={() => { setView(VIEW_CARD); setGalleryContext(null); }}
       />
@@ -103,13 +107,24 @@ export default function CardExplorer() {
       {/* Body */}
       <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
 
-        <ArtistSidebar
-          artists={favoriteArtists}
-          selectedArtist={selectedArtist}
-          currentView={view}
+        <SavedSidebar
+          favoriteArtists={favoriteArtists}
           onSelectArtist={openArtist}
           onRemoveArtist={toggleFavoriteArtist}
-          onClear={clearFavoriteArtists}
+          selectedArtist={selectedArtist}
+          currentView={view}
+          favorites={favorites}
+          onSelectFavorite={(card) => loadCard(card, 0, favorites, VIEW_FAVORITES)}
+          onRemoveFavorite={removeFavorite}
+          collection={collection}
+          onSelectCollectionCard={(item) => loadCard(item.cardData, 0, collection.map(c => c.cardData), VIEW_FAVORITES)}
+          onRemoveFromCollection={removeFromCollection}
+          decks={decks}
+          onSelectDeck={(deck) => { /* TODO: open deck editor */ }}
+          onRemoveDeck={deleteDeck}
+          mobileOpen={mobileSidebarOpen}
+          onClose={() => setMobileSidebarOpen(false)}
+          onWidthChange={setSidebarWidth}
         />
 
         {/* Main */}
@@ -229,6 +244,10 @@ export default function CardExplorer() {
                       hasFaces={hasFaces}
                       flipTargetName={flipTargetName}
                       onFlipFace={() => setActiveFace(f => f === 0 ? 1 : 0)}
+                      isOwned={(printingId) => isOwned(printingId)}
+                      getOwnedQuantity={(printingId) => collection.find(c => c.cardId === printingId)?.quantityOwned ?? 0}
+                      onAddToCollection={(card, qty) => addToCollection(card, qty)}
+                      onUpdateQuantity={(printingId, qty) => updateQuantity(printingId, qty)}
                     />
 
                     {/* Mobile prev/next */}
@@ -263,7 +282,7 @@ export default function CardExplorer() {
       </div>
 
       {/* Desktop gallery nav arrows */}
-      <NavArrow direction="prev" onClick={() => navigateGallery(-1, loadCard)} visible={canGoPrev} sidebarWidth={SIDEBAR_WIDTH} />
+      <NavArrow direction="prev" onClick={() => navigateGallery(-1, loadCard)} visible={canGoPrev} sidebarWidth={sidebarWidth} />
       <NavArrow direction="next" onClick={() => navigateGallery(1, loadCard)} visible={canGoNext} sidebarWidth={0} />
 
       {/* Lightbox */}
@@ -315,6 +334,7 @@ export default function CardExplorer() {
         card={activeCard}
         isOpen={deckChatOpen}
         onClose={() => setDeckChatOpen(false)}
+        onSaveDeck={saveDeck}
       />
     </div>
   );

@@ -1,10 +1,18 @@
 "use client";
 
+import { useState } from "react";
 import { deduplicateDeck } from "../../utils/deckUtils";
 
 const CATEGORY_ORDER = ["Creatures", "Spells", "Artifacts", "Enchantments", "Planeswalkers", "Lands"];
 
-export default function DeckList({ deckData, onCopy, copied }) {
+export default function DeckList({ deckData, onCopy, copied, onSaveDeck }) {
+  const [saved, setSaved] = useState(false);
+
+  const handleSave = () => {
+    onSaveDeck?.(deckData);
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2500);
+  };
   const deduped = deduplicateDeck(deckData.cards);
   const categories = [...new Set(deduped.map(c => c.category))];
   const sorted = CATEGORY_ORDER.filter(c => categories.includes(c));
@@ -43,16 +51,26 @@ export default function DeckList({ deckData, onCopy, copied }) {
         })}
       </div>
 
-      <div style={{ padding: "10px 16px", borderTop: "0.5px solid rgba(201,185,154,0.15)" }}>
+      <div style={{ padding: "10px 16px", borderTop: "0.5px solid rgba(201,185,154,0.15)", display: "flex", gap: 8 }}>
+        <button onClick={handleSave} style={{
+          flex: 1, padding: "8px", borderRadius: 6,
+          background: saved ? "rgba(80,160,120,0.15)" : "rgba(201,185,154,0.08)",
+          border: "0.5px solid " + (saved ? "rgba(80,160,120,0.4)" : "rgba(201,185,154,0.2)"),
+          color: saved ? "rgba(100,190,150,0.9)" : "rgba(201,185,154,0.6)",
+          fontSize: 12, cursor: "pointer", fontFamily: "inherit",
+          transition: "all 0.2s",
+        }}>
+          {saved ? "✓ Saved to My Grimoire" : "Save to My Grimoire"}
+        </button>
         <button onClick={onCopy} style={{
-          width: "100%", padding: "8px", borderRadius: 6,
+          flex: 1, padding: "8px", borderRadius: 6,
           background: copied ? "rgba(100,180,100,0.15)" : "rgba(201,185,154,0.08)",
           border: "0.5px solid " + (copied ? "rgba(100,180,100,0.4)" : "rgba(201,185,154,0.2)"),
           color: copied ? "rgba(100,200,100,0.9)" : "rgba(201,185,154,0.6)",
           fontSize: 12, cursor: "pointer", fontFamily: "inherit",
           transition: "all 0.2s",
         }}>
-          {copied ? "✓ Copied to clipboard" : "Copy deck list"}
+          {copied ? "✓ Copied" : "Copy list"}
         </button>
       </div>
     </div>
