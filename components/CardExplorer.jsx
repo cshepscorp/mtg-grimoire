@@ -60,6 +60,12 @@ export default function CardExplorer() {
     : null;
   const canRotate = ["split", "flip", "aftermath", "planar", "scheme"].includes(displayCard?.layout);
 
+  // Reset scroll to top on every view change
+  useEffect(() => {
+    mainRef.current?.scrollTo({ top: 0, behavior: "instant" });
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }, [view]);
+
   // Touch tracking for swipe
   const touchStartX = useRef(null);
 

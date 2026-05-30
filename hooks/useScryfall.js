@@ -209,8 +209,10 @@ export default function useScryfall({ setGalleryContext, setView }) {
     try {
       let url = `https://api.scryfall.com/cards/search?q=${encodeURIComponent(scryfallQuery)}&unique=cards&order=name`;
       let accumulated = [];
+      let pages = 0;
+      const PAGE_CAP = 10;
 
-      while (url) {
+      while (url && pages < PAGE_CAP) {
         const res = await fetch(url, { signal: controller.signal });
         if (res.status === 429) {
           setFilterError("Scryfall is rate limiting requests — wait a moment and try again.");
@@ -223,6 +225,7 @@ export default function useScryfall({ setGalleryContext, setView }) {
         const data = await res.json();
         accumulated = [...accumulated, ...(data.data?.filter((c) => c.image_uris) ?? [])];
         setFilterCards([...accumulated]);
+        pages++;
         url = data.has_more ? data.next_page : null;
         if (url) await new Promise(r => setTimeout(r, 100));
       }

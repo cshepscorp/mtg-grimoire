@@ -8,18 +8,32 @@ export default function ScrollToTop({ containerRef }) {
 
   useEffect(() => {
     const el = containerRef?.current;
-    if (!el) return;
-    const onScroll = () => setVisible(el.scrollTop > 300);
-    el.addEventListener("scroll", onScroll, { passive: true });
-    return () => el.removeEventListener("scroll", onScroll);
+
+    const check = () => {
+      const elScroll = el ? el.scrollTop : 0;
+      setVisible(elScroll > 300 || window.scrollY > 300);
+    };
+
+    el?.addEventListener("scroll", check, { passive: true });
+    window.addEventListener("scroll", check, { passive: true });
+
+    return () => {
+      el?.removeEventListener("scroll", check);
+      window.removeEventListener("scroll", check);
+    };
   }, [containerRef]);
+
+  const scrollToTop = () => {
+    containerRef?.current?.scrollTo({ top: 0, behavior: "smooth" });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   if (!visible) return null;
 
   return (
     <button
       className={styles.btn}
-      onClick={() => containerRef?.current?.scrollTo({ top: 0, behavior: "smooth" })}
+      onClick={scrollToTop}
       aria-label="Scroll to top"
     >
       ↑
