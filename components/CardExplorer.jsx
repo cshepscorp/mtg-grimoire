@@ -45,7 +45,7 @@ export default function CardExplorer() {
     rulings, rulingsLoading,
     randomLoading, searchLoading, artistLoading, filterLoading,
     error,
-    loadCard, doRandom, doSearch, openArtist, openFilter,
+    loadCard, loadCardById, doRandom, doSearch, openArtist, openFilter,
     searchResults, searchQuery,
     artistCards, selectedArtist,
     filterCards, filterLabel, filterSublabel, filterError, filterBackView,
@@ -123,10 +123,10 @@ export default function CardExplorer() {
           selectedArtist={selectedArtist}
           currentView={view}
           favorites={favorites}
-          onSelectFavorite={(card) => loadCard(card, 0, favorites, VIEW_FAVORITES)}
+          onSelectFavorite={(card) => loadCardById(card.id)}
           onRemoveFavorite={removeFavorite}
           collection={collection}
-          onSelectCollectionCard={(item) => loadCard(item.cardData, 0, collection.map(c => c.cardData), VIEW_FAVORITES)}
+          onSelectCollectionCard={(item) => loadCardById(item.cardId)}
           onRemoveFromCollection={removeFromCollection}
           decks={decks}
           onSelectDeck={(deck) => { /* TODO: open deck editor */ }}

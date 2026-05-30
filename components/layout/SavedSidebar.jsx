@@ -205,7 +205,7 @@ export default function SavedSidebar({
   const renderCollectionItem = (item) => (
     <div key={item.id} style={{ display: "flex", alignItems: "center", gap: 4, marginBottom: 3 }}>
       <ItemBtn onClick={act(() => onSelectCollectionCard?.(item))} title={`${item.cardName} (${item.setCode ?? "?"})`}>
-        <span style={{ width: 7, height: 7, borderRadius: "50%", background: cardColorDot(item.cardData), flexShrink: 0, display: "inline-block" }} />
+        <span style={{ width: 7, height: 7, borderRadius: "50%", background: cardColorDot({ colors: item.colors, color_identity: item.colorIdentity }), flexShrink: 0, display: "inline-block" }} />
         <span style={{ flex: 1, minWidth: 0, overflow: "hidden" }}>
           <span style={{ display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{item.cardName}</span>
           {item.setCode && (

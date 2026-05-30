@@ -16,14 +16,27 @@ export default function useCollection() {
     try { localStorage.setItem(KEY, JSON.stringify(next)); } catch {}
   };
 
-  const addToCollection = useCallback((card, quantity = 1, deckId = null) => {
+  const addToCollection = useCallback((card, quantity = 1) => {
     setCollection(prev => {
       const existing = prev.find(c => c.cardId === card.id);
       let next;
       if (existing) {
-        next = prev.map(c => c.cardId === card.id ? { ...c, quantityOwned: c.quantityOwned + quantity } : c);
+        next = prev.map(c => c.cardId === card.id
+          ? { ...c, quantityOwned: c.quantityOwned + quantity }
+          : c
+        );
       } else {
-        next = [{ id: crypto.randomUUID(), cardId: card.id, cardName: card.name, cardData: card, setCode: card.set?.toUpperCase(), setName: card.set_name, collectorNumber: card.collector_number, quantityOwned: quantity }, ...prev];
+        next = [{
+          id: crypto.randomUUID(),
+          cardId: card.id,
+          cardName: card.name,
+          setCode: card.set?.toUpperCase(),
+          setName: card.set_name,
+          collectorNumber: card.collector_number,
+          colors: card.colors ?? [],
+          colorIdentity: card.color_identity ?? [],
+          quantityOwned: quantity,
+        }, ...prev];
       }
       persist(next);
       return next;

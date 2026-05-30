@@ -2,6 +2,16 @@ import { useState, useEffect, useCallback } from "react";
 
 const KEY = "grimoire_favorites";
 
+const slim = (card) => ({
+  id: card.id,
+  name: card.name,
+  set: card.set,
+  set_name: card.set_name,
+  collector_number: card.collector_number,
+  colors: card.colors ?? [],
+  color_identity: card.color_identity ?? [],
+});
+
 export default function useFavorites() {
   const [favorites, setFavorites] = useState([]);
 
@@ -12,15 +22,10 @@ export default function useFavorites() {
     } catch {}
   }, []);
 
-  const persist = useCallback((next) => {
-    setFavorites(next);
-    try { localStorage.setItem(KEY, JSON.stringify(next)); } catch {}
-  }, []);
-
   const addFavorite = useCallback((card) => {
     setFavorites(prev => {
       if (prev.some(c => c.id === card.id)) return prev;
-      const next = [card, ...prev];
+      const next = [slim(card), ...prev];
       try { localStorage.setItem(KEY, JSON.stringify(next)); } catch {}
       return next;
     });
@@ -41,7 +46,7 @@ export default function useFavorites() {
   const toggleFavorite = useCallback((card) => {
     setFavorites(prev => {
       const exists = prev.some(c => c.id === card.id);
-      const next = exists ? prev.filter(c => c.id !== card.id) : [card, ...prev];
+      const next = exists ? prev.filter(c => c.id !== card.id) : [slim(card), ...prev];
       try { localStorage.setItem(KEY, JSON.stringify(next)); } catch {}
       return next;
     });

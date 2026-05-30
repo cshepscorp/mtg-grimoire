@@ -104,6 +104,19 @@ export default function useScryfall({ setGalleryContext, setView }) {
     setRandomLoading(false);
   }, [loadCard, setGalleryContext]);
 
+  const loadCardById = useCallback(async (scryfallId) => {
+    setRandomLoading(true);
+    setError("");
+    setGalleryContext(null);
+    try {
+      const res = await fetch(`https://api.scryfall.com/cards/${scryfallId}`);
+      if (!res.ok) { setError("Could not load card."); return; }
+      const data = await res.json();
+      await loadCard(data);
+    } catch { setError("Could not load card."); }
+    setRandomLoading(false);
+  }, [loadCard, setGalleryContext]);
+
   const openArtist = useCallback(async (artistName) => {
     artistAbortRef.current?.abort();
     const controller = new AbortController();
@@ -253,7 +266,7 @@ export default function useScryfall({ setGalleryContext, setView }) {
     rulings, rulingsLoading,
     randomLoading, searchLoading, artistLoading, filterLoading,
     error,
-    loadCard, doRandom, doSearch, openArtist, openFilter,
+    loadCard, loadCardById, doRandom, doSearch, openArtist, openFilter,
     searchResults, searchQuery,
     artistCards, selectedArtist,
     filterCards, filterLabel, filterSublabel, filterError, filterBackView,
