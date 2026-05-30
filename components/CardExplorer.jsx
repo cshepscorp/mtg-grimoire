@@ -11,6 +11,7 @@ import SearchHeader from "./layout/SearchHeader";
 import SavedSidebar from "./layout/SavedSidebar";
 import NavArrow from "./nav/NavArrow";
 import MobileNav from "./nav/MobileNav";
+import ScrollToTop from "./nav/ScrollToTop";
 import useFavoriteArtists from "../hooks/useFavoriteArtists";
 import useFavorites from "../hooks/useFavorites";
 import useCollection from "../hooks/useCollection";
@@ -29,6 +30,7 @@ export default function CardExplorer() {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [view, setView] = useState(VIEW_CARD);
   const [sidebarWidth, setSidebarWidth] = useState(260);
+  const mainRef = useRef(null);
 
   const { favoriteArtists, toggleFavoriteArtist, isArtistFavorite, clearFavoriteArtists } = useFavoriteArtists();
   const { favorites, isFavorite, toggleFavorite, removeFavorite } = useFavorites();
@@ -128,7 +130,7 @@ export default function CardExplorer() {
         />
 
         {/* Main */}
-        <main style={{ flex: 1, overflowY: "auto" }}>
+        <main ref={mainRef} style={{ flex: 1, overflowY: "auto" }}>
 
           {view === VIEW_FAVORITES && (
             <CardGrid
@@ -278,6 +280,7 @@ export default function CardExplorer() {
             </div>
             </>
           )}
+          <ScrollToTop containerRef={mainRef} />
         </main>
       </div>
 
