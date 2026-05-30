@@ -194,9 +194,14 @@ export default function SavedSidebar({
 
   const renderCardItem = (card) => (
     <div key={card.id} style={{ display: "flex", alignItems: "center", gap: 4, marginBottom: 3 }}>
-      <ItemBtn onClick={act(() => onSelectFavorite?.(card))} title={card.name}>
+      <ItemBtn onClick={act(() => onSelectFavorite?.(card))} title={`${card.name} (${card.set?.toUpperCase() ?? "?"})`}>
         <span style={{ width: 7, height: 7, borderRadius: "50%", background: cardColorDot(card), flexShrink: 0, display: "inline-block" }} />
-        <span style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{card.name}</span>
+        <span style={{ flex: 1, minWidth: 0, overflow: "hidden" }}>
+          <span style={{ display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{card.name}</span>
+          {card.set && (
+            <span style={{ fontSize: 9, color: "rgba(201,185,154,0.35)", letterSpacing: "0.06em" }}>{card.set.toUpperCase()}</span>
+          )}
+        </span>
       </ItemBtn>
       <RemoveBtn onClick={() => onRemoveFavorite?.(card.id)} />
     </div>

@@ -69,7 +69,7 @@ export default function useScryfall({ setGalleryContext, setView }) {
     setRulingsLoading(false);
   }, []);
 
-  const loadCard = useCallback(async (cardData, galleryIndex = null, galleryCards = null, galleryLabel = null) => {
+  const loadCard = useCallback(async (cardData, galleryIndex = null, galleryCards = null, galleryLabel = null, preferPrintingId = null) => {
     setCard(cardData);
     setActivePrinting(0);
     setActiveFace(0);
@@ -84,7 +84,12 @@ export default function useScryfall({ setGalleryContext, setView }) {
         `https://api.scryfall.com/cards/search?order=released&q=!"${encodeURIComponent(cardData.name)}"&unique=prints`
       );
       const data = await res.json();
-      setPrintings(data.data?.filter((p) => p.image_uris || p.card_faces?.some(f => f.image_uris)) ?? [cardData]);
+      const prints = data.data?.filter((p) => p.image_uris || p.card_faces?.some(f => f.image_uris)) ?? [cardData];
+      setPrintings(prints);
+      if (preferPrintingId) {
+        const idx = prints.findIndex(p => p.id === preferPrintingId);
+        if (idx !== -1) setActivePrinting(idx);
+      }
     } catch {
       setPrintings([cardData]);
     }
@@ -112,7 +117,7 @@ export default function useScryfall({ setGalleryContext, setView }) {
       const res = await fetch(`https://api.scryfall.com/cards/${scryfallId}`);
       if (!res.ok) { setError("Could not load card."); return; }
       const data = await res.json();
-      await loadCard(data);
+      await loadCard(data, null, null, null, scryfallId);
     } catch { setError("Could not load card."); }
     setRandomLoading(false);
   }, [loadCard, setGalleryContext]);
