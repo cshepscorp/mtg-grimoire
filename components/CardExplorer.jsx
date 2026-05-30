@@ -18,7 +18,7 @@ import useCollection from "../hooks/useCollection";
 import useDecks from "../hooks/useDecks";
 import useGallery from "../hooks/useGallery";
 import useScryfall from "../hooks/useScryfall";
-import { VIEW_CARD, VIEW_SEARCH, VIEW_ARTIST, VIEW_FILTER, VIEW_SETS, VIEW_COLORS, VIEW_FAVORITES } from "../utils/constants";
+import { VIEW_CARD, VIEW_SEARCH, VIEW_ARTIST, VIEW_FILTER, VIEW_SETS, VIEW_COLORS, VIEW_FAVORITES, VIEW_MY_GRIMOIRE } from "../utils/constants";
 import styles from "./CardExplorer.module.css";
 
 export default function CardExplorer() {
@@ -48,7 +48,7 @@ export default function CardExplorer() {
     loadCard, doRandom, doSearch, openArtist, openFilter,
     searchResults, searchQuery,
     artistCards, selectedArtist,
-    filterCards, filterLabel, filterSublabel, filterError,
+    filterCards, filterLabel, filterSublabel, filterError, filterBackView,
     artistError,
     sets, setsLoading, openSetBrowser,
     activeCard, lightboxImageUrl,
@@ -141,7 +141,7 @@ export default function CardExplorer() {
               loading={false}
               loadingText=""
               onSelectCard={(c, i) => loadCard(c, i, favorites, VIEW_FAVORITES)}
-              onBack={() => setView(VIEW_FAVORITES)}
+              onBack={() => setView(VIEW_CARD)}
             />
           )}
 
@@ -149,13 +149,13 @@ export default function CardExplorer() {
             <SetBrowser
               sets={sets}
               loading={setsLoading}
-              onSelectSet={(set) => openFilter("Set", set.name, `e:${set.code}`)}
+              onSelectSet={(set) => openFilter("Set", set.name, `e:${set.code}`, VIEW_SETS)}
             />
           )}
 
           {view === VIEW_COLORS && (
             <ColorBrowser
-              onSelectColor={(color) => openFilter("Color", color.name, color.query)}
+              onSelectColor={(color) => openFilter("Color", color.name, color.query, VIEW_COLORS)}
             />
           )}
 
@@ -164,7 +164,7 @@ export default function CardExplorer() {
               cards={searchResults} label="Search results" sublabel={`"${searchQuery}"`}
               loading={searchLoading} loadingText="Searching the archives..."
               onSelectCard={(c, i) => loadCard(c, i, searchResults, VIEW_SEARCH)}
-              onBack={() => setView(VIEW_SEARCH)}
+              onBack={() => setView(VIEW_CARD)}
             />
           )}
 
@@ -174,7 +174,7 @@ export default function CardExplorer() {
               loading={artistLoading} loadingText="Gathering works..."
               error={artistError}
               onSelectCard={(c, i) => loadCard(c, i, artistCards, VIEW_ARTIST)}
-              onBack={() => setView(VIEW_ARTIST)}
+              onBack={() => setView(VIEW_CARD)}
               headerAction={selectedArtist && (
                 <button
                   onClick={() => toggleFavoriteArtist(selectedArtist)}
@@ -199,7 +199,7 @@ export default function CardExplorer() {
               loading={filterLoading} loadingText="Browsing the collection..."
               error={filterError}
               onSelectCard={(c, i) => loadCard(c, i, filterCards, VIEW_FILTER)}
-              onBack={() => setView(VIEW_FILTER)}
+              onBack={() => setView(filterBackView)}
             />
           )}
 
