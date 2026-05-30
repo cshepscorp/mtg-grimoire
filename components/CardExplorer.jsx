@@ -48,7 +48,8 @@ export default function CardExplorer() {
     loadCard, doRandom, doSearch, openArtist, openFilter,
     searchResults, searchQuery,
     artistCards, selectedArtist,
-    filterCards, filterLabel, filterSublabel,
+    filterCards, filterLabel, filterSublabel, filterError,
+    artistError,
     sets, setsLoading, openSetBrowser,
     activeCard, lightboxImageUrl,
     isLoading,
@@ -171,6 +172,7 @@ export default function CardExplorer() {
             <CardGrid
               cards={artistCards} label="Artist" sublabel={selectedArtist}
               loading={artistLoading} loadingText="Gathering works..."
+              error={artistError}
               onSelectCard={(c, i) => loadCard(c, i, artistCards, VIEW_ARTIST)}
               onBack={() => setView(VIEW_ARTIST)}
               headerAction={selectedArtist && (
@@ -195,6 +197,7 @@ export default function CardExplorer() {
             <CardGrid
               cards={filterCards} label={filterLabel} sublabel={filterSublabel}
               loading={filterLoading} loadingText="Browsing the collection..."
+              error={filterError}
               onSelectCard={(c, i) => loadCard(c, i, filterCards, VIEW_FILTER)}
               onBack={() => setView(VIEW_FILTER)}
             />

@@ -26,6 +26,10 @@ export default function useScryfall({ setGalleryContext, setView }) {
   const [filterSublabel, setFilterSublabel] = useState("");
   const [filterCards, setFilterCards] = useState([]);
   const [filterLoading, setFilterLoading] = useState(false);
+  const [filterError, setFilterError] = useState("");
+  const [artistError, setArtistError] = useState("");
+  const filterAbortRef = useRef(null);
+  const artistAbortRef = useRef(null);
 
   const [sets, setSets] = useState([]);
   const [setsLoading, setSetsLoading] = useState(false);
@@ -100,18 +104,31 @@ export default function useScryfall({ setGalleryContext, setView }) {
   }, [loadCard, setGalleryContext]);
 
   const openArtist = useCallback(async (artistName) => {
+    artistAbortRef.current?.abort();
+    const controller = new AbortController();
+    artistAbortRef.current = controller;
+
     setSelectedArtist(artistName);
     setView(VIEW_ARTIST);
     setArtistLoading(true);
     setArtistCards([]);
+    setArtistError("");
     try {
       const res = await fetch(
-        `https://api.scryfall.com/cards/search?q=a:"${encodeURIComponent(artistName)}"&unique=art&order=name`
+        `https://api.scryfall.com/cards/search?q=a:"${encodeURIComponent(artistName)}"&unique=art&order=name`,
+        { signal: controller.signal }
       );
-      const data = await res.json();
-      const cards = data.data?.filter((c) => c.image_uris?.art_crop) ?? [];
-      setArtistCards(cards);
-    } catch {}
+      if (res.status === 429) {
+        setArtistError("Scryfall is rate limiting requests — wait a moment and try again.");
+      } else if (!res.ok) {
+        setArtistError("Failed to load artist cards. Please try again.");
+      } else {
+        const data = await res.json();
+        setArtistCards(data.data?.filter((c) => c.image_uris?.art_crop) ?? []);
+      }
+    } catch (e) {
+      if (e.name !== "AbortError") setArtistError("Failed to load artist cards. Check your connection.");
+    }
     setArtistLoading(false);
   }, [setView]);
 
@@ -176,18 +193,32 @@ export default function useScryfall({ setGalleryContext, setView }) {
   }, [setView]);
 
   const openFilter = useCallback(async (label, sublabel, scryfallQuery) => {
+    filterAbortRef.current?.abort();
+    const controller = new AbortController();
+    filterAbortRef.current = controller;
+
     setFilterLabel(label);
     setFilterSublabel(sublabel);
+    setFilterError("");
     setView(VIEW_FILTER);
     setFilterLoading(true);
     setFilterCards([]);
     try {
       const res = await fetch(
-        `https://api.scryfall.com/cards/search?q=${encodeURIComponent(scryfallQuery)}&unique=cards&order=name`
+        `https://api.scryfall.com/cards/search?q=${encodeURIComponent(scryfallQuery)}&unique=cards&order=name`,
+        { signal: controller.signal }
       );
-      const data = await res.json();
-      setFilterCards(data.data?.filter((c) => c.image_uris) ?? []);
-    } catch {}
+      if (res.status === 429) {
+        setFilterError("Scryfall is rate limiting requests — wait a moment and try again.");
+      } else if (!res.ok) {
+        setFilterError("Failed to load cards. Please try again.");
+      } else {
+        const data = await res.json();
+        setFilterCards(data.data?.filter((c) => c.image_uris) ?? []);
+      }
+    } catch (e) {
+      if (e.name !== "AbortError") setFilterError("Failed to load cards. Check your connection.");
+    }
     setFilterLoading(false);
   }, [setView]);
 
@@ -212,7 +243,8 @@ export default function useScryfall({ setGalleryContext, setView }) {
     loadCard, doRandom, doSearch, openArtist, openFilter,
     searchResults, searchQuery,
     artistCards, selectedArtist,
-    filterCards, filterLabel, filterSublabel,
+    filterCards, filterLabel, filterSublabel, filterError,
+    artistError,
     sets, setsLoading, openSetBrowser,
     activeCard, cardImageUrl, lightboxImageUrl,
     isLoading,

@@ -1,4 +1,4 @@
-export default function CardGrid({ cards, label, sublabel, loading, loadingText, onSelectCard, onBack, headerAction }) {
+export default function CardGrid({ cards, label, sublabel, loading, loadingText, onSelectCard, onBack, headerAction, error }) {
   return (
     <div style={{ padding: "2rem" }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1.5rem" }}>
@@ -17,7 +17,23 @@ export default function CardGrid({ cards, label, sublabel, loading, loadingText,
       </div>
 
       {loading && <div style={{ textAlign: "center", padding: "4rem", color: "rgba(201,185,154,0.3)", fontSize: 13 }}>{loadingText}</div>}
-      {!loading && cards.length === 0 && <div style={{ textAlign: "center", padding: "4rem", color: "rgba(201,185,154,0.3)", fontSize: 13 }}>No results found.</div>}
+      {!loading && error && (
+        <div style={{
+          margin: "2rem auto", maxWidth: 480,
+          background: "rgba(220,100,80,0.08)", border: "0.5px solid rgba(220,100,80,0.3)",
+          borderRadius: 10, padding: "1.25rem 1.5rem",
+          display: "flex", alignItems: "flex-start", gap: 12,
+        }}>
+          <span style={{ fontSize: 18, lineHeight: 1, marginTop: 1 }}>⚠</span>
+          <div>
+            <div style={{ fontSize: 13, color: "rgba(220,140,120,0.9)", fontWeight: 600, marginBottom: 4 }}>
+              Request failed
+            </div>
+            <div style={{ fontSize: 12, color: "rgba(220,140,120,0.7)", lineHeight: 1.6 }}>{error}</div>
+          </div>
+        </div>
+      )}
+      {!loading && !error && cards.length === 0 && <div style={{ textAlign: "center", padding: "4rem", color: "rgba(201,185,154,0.3)", fontSize: 13 }}>No results found.</div>}
 
       {!loading && cards.length > 0 && (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 12 }}>
