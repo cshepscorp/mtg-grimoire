@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import Link from "next/link";
 import { VIEW_ARTIST } from "../../utils/constants";
 import styles from "./SavedSidebar.module.css";
 
@@ -117,27 +118,33 @@ export default function SavedSidebar({
     fontFamily: "inherit", padding: 0, outline: "none",
   };
 
-  const renderSection = ({ key, label, count, items, renderItem, emptyText }) => {
+  const renderSection = ({ key, label, count, items, renderItem, emptyText, tabLink }) => {
     const open = isOpen(key, count);
     return (
       <div key={key}>
         <div style={{ borderTop: "0.5px solid rgba(201,185,154,0.08)", margin: "8px 0 0" }} />
-        <button
-          onClick={() => toggleSection(key, count)}
-          style={{
-            ...btnBase,
-            display: "flex", alignItems: "center", justifyContent: "space-between",
-            width: "100%", padding: "8px 0 6px",
-            color: "rgba(201,185,154,0.5)",
-            fontSize: 10, letterSpacing: "0.15em", textTransform: "uppercase",
-            transition: "color 0.15s",
-          }}
-          onMouseEnter={e => e.currentTarget.style.color = "rgba(201,185,154,0.8)"}
-          onMouseLeave={e => e.currentTarget.style.color = "rgba(201,185,154,0.5)"}
-        >
-          <span>{open ? "▾" : "▸"} {label}</span>
-          <span style={{ color: "rgba(201,185,154,0.3)", fontWeight: 400 }}>({count})</span>
-        </button>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "8px 0 6px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+            <button
+              onClick={() => toggleSection(key, count)}
+              style={{ ...btnBase, color: "rgba(201,185,154,0.5)", fontSize: 10, transition: "color 0.15s", padding: "0 2px" }}
+              onMouseEnter={e => e.currentTarget.style.color = "rgba(201,185,154,0.8)"}
+              onMouseLeave={e => e.currentTarget.style.color = "rgba(201,185,154,0.5)"}
+            >{open ? "▾" : "▸"}</button>
+            <Link
+              href={tabLink}
+              style={{ color: "rgba(201,185,154,0.5)", fontSize: 10, letterSpacing: "0.15em", textTransform: "uppercase", textDecoration: "none", transition: "color 0.15s" }}
+              onMouseEnter={e => e.currentTarget.style.color = "rgba(201,185,154,0.8)"}
+              onMouseLeave={e => e.currentTarget.style.color = "rgba(201,185,154,0.5)"}
+            >{label}</Link>
+          </div>
+          <Link
+            href={tabLink}
+            style={{ color: "rgba(201,185,154,0.3)", fontSize: 10, textDecoration: "none", transition: "color 0.15s" }}
+            onMouseEnter={e => e.currentTarget.style.color = "rgba(201,185,154,0.6)"}
+            onMouseLeave={e => e.currentTarget.style.color = "rgba(201,185,154,0.3)"}
+          >({count})</Link>
+        </div>
 
         {open && (
           <div style={{ marginBottom: 4 }}>
@@ -233,10 +240,10 @@ export default function SavedSidebar({
   );
 
   const sectionDefs = [
-    { key: "artists", label: "Artists", count: favoriteArtists.length, items: favoriteArtists, renderItem: renderArtistItem, emptyText: "Favorite an artist to save them here." },
-    { key: "cards",   label: "Cards",   count: favorites.length,       items: favorites,       renderItem: renderCardItem,       emptyText: "Heart a card to save it here." },
-    { key: "collection", label: "Collection", count: collection.length, items: collection,     renderItem: renderCollectionItem, emptyText: "Add cards you own to track your collection." },
-    { key: "decks",  label: "Decks",   count: decks.length,            items: decks,           renderItem: renderDeckItem,       emptyText: "COMING SOON: Save a generated deck or build one from scratch." },
+    { key: "artists",    label: "Artists",    count: favoriteArtists.length, items: favoriteArtists, renderItem: renderArtistItem,     emptyText: "Favorite an artist to save them here.",            tabLink: "/my-grimoire?tab=artists" },
+    { key: "cards",      label: "Cards",      count: favorites.length,       items: favorites,       renderItem: renderCardItem,       emptyText: "Heart a card to save it here.",                    tabLink: "/my-grimoire?tab=favorites" },
+    { key: "collection", label: "Collection", count: collection.length,      items: collection,      renderItem: renderCollectionItem, emptyText: "Add cards you own to track your collection.",       tabLink: "/my-grimoire?tab=collection" },
+    { key: "decks",      label: "Decks",      count: decks.length,           items: decks,           renderItem: renderDeckItem,       emptyText: "Save a generated deck or build one from scratch.",  tabLink: "/my-grimoire?tab=decks" },
   ];
 
   return (

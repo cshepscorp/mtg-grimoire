@@ -10,6 +10,7 @@ const slim = (card) => ({
   collector_number: card.collector_number,
   colors: card.colors ?? [],
   color_identity: card.color_identity ?? [],
+  image_uri: card.image_uris?.normal ?? card.card_faces?.[0]?.image_uris?.normal ?? null,
 });
 
 export default function useFavorites() {

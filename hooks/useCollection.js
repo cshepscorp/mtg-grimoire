@@ -35,6 +35,7 @@ export default function useCollection() {
           collectorNumber: card.collector_number,
           colors: card.colors ?? [],
           colorIdentity: card.color_identity ?? [],
+          imageUri: card.image_uris?.normal ?? card.card_faces?.[0]?.image_uris?.normal ?? null,
           quantityOwned: quantity,
         }, ...prev];
       }

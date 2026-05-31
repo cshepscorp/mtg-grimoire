@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { VIEW_CARD, VIEW_SEARCH, VIEW_ARTIST, VIEW_FILTER, VIEW_SETS } from "../utils/constants";
 import { checkLimit, incrementUsage } from "../utils/rateLimit";
 
-export default function useScryfall({ setGalleryContext, setView }) {
+export default function useScryfall({ setGalleryContext, setView, skipInitialRandom = false }) {
   const [card, setCard] = useState(null);
   const [printings, setPrintings] = useState([]);
   const [activePrinting, setActivePrinting] = useState(0);
@@ -253,7 +253,7 @@ export default function useScryfall({ setGalleryContext, setView }) {
     setFilterLoading(false);
   }, [setView]);
 
-  useEffect(() => { doRandom(); }, []);
+  useEffect(() => { if (!skipInitialRandom) doRandom(); }, []);
 
   const activeCard = printings[activePrinting] || card;
   const hasFaces = !!(activeCard?.card_faces?.length > 1 && !activeCard?.image_uris);

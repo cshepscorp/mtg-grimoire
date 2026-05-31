@@ -57,11 +57,10 @@ export default function SearchHeader({ query, setQuery, searchMode, setSearchMod
   }, [query, searchMode]);
 
   const selectSuggestion = (name) => {
-    suppressNextFetchRef.current = true;
-    setQuery(name);
     setSuggestions([]);
     setShowSuggestions(false);
     setSelectedIdx(-1);
+    setQuery("");
     onSearch(name, searchMode);
   };
 
@@ -77,7 +76,9 @@ export default function SearchHeader({ query, setQuery, searchMode, setSearchMod
     e.preventDefault();
     setShowSuggestions(false);
     setSuggestions([]);
-    onSearch(query, searchMode);
+    const q = query.trim();
+    setQuery("");
+    onSearch(q, searchMode);
   };
 
   const handleOpenSets = () => { onOpenSets(); setMenuOpen(false); };

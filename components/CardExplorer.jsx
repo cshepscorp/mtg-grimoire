@@ -12,16 +12,13 @@ import SavedSidebar from "./layout/SavedSidebar";
 import NavArrow from "./nav/NavArrow";
 import MobileNav from "./nav/MobileNav";
 import ScrollToTop from "./nav/ScrollToTop";
-import useFavoriteArtists from "../hooks/useFavoriteArtists";
-import useFavorites from "../hooks/useFavorites";
-import useCollection from "../hooks/useCollection";
-import useDecks from "../hooks/useDecks";
+import { useGrimoire } from "../contexts/GrimoireContext";
 import useGallery from "../hooks/useGallery";
 import useScryfall from "../hooks/useScryfall";
 import { VIEW_CARD, VIEW_SEARCH, VIEW_ARTIST, VIEW_FILTER, VIEW_SETS, VIEW_COLORS, VIEW_FAVORITES, VIEW_MY_GRIMOIRE } from "../utils/constants";
 import styles from "./CardExplorer.module.css";
 
-export default function CardExplorer() {
+export default function CardExplorer({ initialCardId, initialArtist }) {
   const [query, setQuery] = useState("");
   const [searchMode, setSearchMode] = useState("name");
   const [lightboxOpen, setLightboxOpen] = useState(false);
@@ -32,13 +29,15 @@ export default function CardExplorer() {
   const [sidebarWidth, setSidebarWidth] = useState(260);
   const mainRef = useRef(null);
 
-  const { favoriteArtists, toggleFavoriteArtist, isArtistFavorite, clearFavoriteArtists } = useFavoriteArtists();
-  const { favorites, isFavorite, toggleFavorite, removeFavorite } = useFavorites();
-  const { collection, addToCollection, removeFromCollection, updateQuantity, isOwned } = useCollection();
-  const { decks, saveDeck, deleteDeck } = useDecks();
-  const { galleryContext, setGalleryContext, navigateGallery, goBackToGallery, canGoPrev, canGoNext } = useGallery({ setView, view });
   const {
-
+    favorites, isFavorite, toggleFavorite, removeFavorite,
+    collection, addToCollection, removeFromCollection, updateQuantity, isOwned,
+    decks, saveDeck, deleteDeck,
+    favoriteArtists, toggleFavoriteArtist, isArtistFavorite, clearFavoriteArtists,
+  } = useGrimoire();
+  const { galleryContext, setGalleryContext, navigateGallery, goBackToGallery, canGoPrev, canGoNext } = useGallery({ setView, view });
+  const hasInitial = !!(initialCardId || initialArtist);
+  const {
     printings, activePrinting, setActivePrinting,
     activeFace, setActiveFace, hasFaces, displayCard,
     lore, loreLoading,
@@ -53,12 +52,18 @@ export default function CardExplorer() {
     sets, setsLoading, openSetBrowser,
     activeCard, lightboxImageUrl,
     isLoading,
-  } = useScryfall({ setGalleryContext, setView });
+  } = useScryfall({ setGalleryContext, setView, skipInitialRandom: hasInitial });
 
   const flipTargetName = hasFaces
     ? activeCard?.card_faces?.[activeFace === 0 ? 1 : 0]?.name
     : null;
   const canRotate = ["split", "flip", "aftermath", "planar", "scheme"].includes(displayCard?.layout);
+
+  // Handle deep-links from My Grimoire
+  useEffect(() => {
+    if (initialCardId) loadCardById(initialCardId);
+    else if (initialArtist) openArtist(initialArtist);
+  }, []);
 
   // Reset scroll to top on every view change
   useEffect(() => {
