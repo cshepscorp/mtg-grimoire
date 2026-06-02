@@ -1,7 +1,7 @@
 import { parseMana, replaceSymbols } from "./ManaPip";
 import ClickableBadge from "./ClickableBadge";
 
-export default function CardDetail({ card, lore, loreLoading, rulings, rulingsLoading, onOpenFilter, onOpenDeckChat }) {
+export default function CardDetail({ card, rulings, rulingsLoading, onOpenFilter, onOpenDeckChat }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
       <div>
@@ -119,13 +119,6 @@ export default function CardDetail({ card, lore, loreLoading, rulings, rulingsLo
           </div>
         </div>
       )}
-
-      <div style={{ borderTop: "0.5px solid rgba(201,185,154,0.12)", paddingTop: 20 }}>
-        <div style={{ fontSize: 10, color: "rgba(201,185,154,0.5)", letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 12 }}>Codex Entry</div>
-        <div style={{ fontSize: 13, lineHeight: 1.8, fontStyle: "italic", color: loreLoading ? "rgba(201,185,154,0.25)" : "rgba(201,185,154,0.75)" }}>
-          {loreLoading ? "Consulting the archives..." : lore}
-        </div>
-      </div>
 
       {(rulingsLoading || rulings?.length > 0) && (
         <div style={{ borderTop: "0.5px solid rgba(201,185,154,0.12)", paddingTop: 20 }}>

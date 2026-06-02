@@ -42,7 +42,6 @@ export default function CardExplorer({ initialCardId, initialArtist }) {
   const {
     printings, activePrinting, setActivePrinting,
     activeFace, setActiveFace, hasFaces, displayCard,
-    lore, loreLoading,
     rulings, rulingsLoading,
     randomLoading, searchLoading, artistLoading, filterLoading,
     error,
@@ -284,8 +283,6 @@ export default function CardExplorer({ initialCardId, initialArtist }) {
                   {/* Right */}
                   <CardDetail
                     card={displayCard}
-                    lore={lore}
-                    loreLoading={loreLoading}
                     rulings={rulings}
                     rulingsLoading={rulingsLoading}
                     onOpenFilter={openFilter}

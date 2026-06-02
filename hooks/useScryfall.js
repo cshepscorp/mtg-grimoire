@@ -1,14 +1,11 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { VIEW_CARD, VIEW_SEARCH, VIEW_ARTIST, VIEW_FILTER, VIEW_SETS } from "../utils/constants";
-import { checkLimit, incrementUsage } from "../utils/rateLimit";
 
 export default function useScryfall({ setGalleryContext, setView, skipInitialRandom = false }) {
   const [card, setCard] = useState(null);
   const [printings, setPrintings] = useState([]);
   const [activePrinting, setActivePrinting] = useState(0);
   const [activeFace, setActiveFace] = useState(0);
-  const [lore, setLore] = useState("");
-  const [loreLoading, setLoreLoading] = useState(false);
   const [rulings, setRulings] = useState([]);
   const [rulingsLoading, setRulingsLoading] = useState(false);
   const [randomLoading, setRandomLoading] = useState(false);
@@ -35,28 +32,6 @@ export default function useScryfall({ setGalleryContext, setView, skipInitialRan
   const [sets, setSets] = useState([]);
   const [setsLoading, setSetsLoading] = useState(false);
   const setsFetchedRef = useRef(false);
-
-  const fetchLore = useCallback(async (cardData) => {
-    if (!checkLimit("lore")) {
-      setLore("The archives have reached their daily limit. Return tomorrow for more lore.");
-      return;
-    }
-    setLoreLoading(true);
-    setLore("");
-    try {
-      const res = await fetch("/api/lore", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ card: cardData }),
-      });
-      const data = await res.json();
-      setLore(data.lore || "The archives are silent on this matter.");
-      incrementUsage("lore");
-    } catch {
-      setLore("The archives are currently inaccessible.");
-    }
-    setLoreLoading(false);
-  }, []);
 
   const fetchRulings = useCallback(async (cardId) => {
     setRulingsLoading(true);
@@ -93,9 +68,8 @@ export default function useScryfall({ setGalleryContext, setView, skipInitialRan
     } catch {
       setPrintings([cardData]);
     }
-    fetchLore(cardData);
     fetchRulings(cardData.id);
-  }, [fetchLore, fetchRulings, setGalleryContext, setView]);
+  }, [fetchRulings, setGalleryContext, setView]);
 
   const doRandom = useCallback(async () => {
     setRandomLoading(true);
