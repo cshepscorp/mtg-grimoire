@@ -15,17 +15,16 @@ export default function DecksTab() {
         <div style={{ fontSize: 12, color: "rgba(201,185,154,0.4)" }}>
           {decks.length} deck{decks.length !== 1 ? "s" : ""}
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <button
-            disabled
-            style={{
-              background: "transparent", border: "0.5px solid rgba(201,185,154,0.12)",
-              borderRadius: 6, padding: "8px 16px", color: "rgba(201,185,154,0.25)",
-              fontSize: 12, cursor: "not-allowed", fontFamily: "inherit",
-            }}
-          >+ New Deck</button>
-          <span style={{ fontSize: 10, color: "rgba(201,185,154,0.35)", letterSpacing: "0.1em", textTransform: "uppercase" }}>Coming soon</span>
-        </div>
+        <button
+          onClick={() => router.push("/deck/new")}
+          style={{
+            background: "rgba(201,185,154,0.08)", border: "0.5px solid rgba(201,185,154,0.3)",
+            borderRadius: 6, padding: "8px 16px", color: "#c9b99a",
+            fontSize: 12, cursor: "pointer", fontFamily: "inherit", transition: "all 0.15s",
+          }}
+          onMouseEnter={e => { e.currentTarget.style.background = "rgba(201,185,154,0.15)"; e.currentTarget.style.borderColor = "rgba(201,185,154,0.5)"; }}
+          onMouseLeave={e => { e.currentTarget.style.background = "rgba(201,185,154,0.08)"; e.currentTarget.style.borderColor = "rgba(201,185,154,0.3)"; }}
+        >+ New Deck</button>
       </div>
 
       {decks.length === 0 ? (
@@ -54,13 +53,14 @@ export default function DecksTab() {
               </div>
 
               <button
-                disabled
-                title="Deck editor coming soon"
+                onClick={() => router.push(`/deck/${deck.id}`)}
                 style={{
-                  background: "transparent", border: "0.5px solid rgba(201,185,154,0.1)",
-                  borderRadius: 5, padding: "5px 12px", color: "rgba(201,185,154,0.25)",
-                  fontSize: 11, cursor: "not-allowed", fontFamily: "inherit", flexShrink: 0,
+                  background: "transparent", border: "0.5px solid rgba(201,185,154,0.2)",
+                  borderRadius: 5, padding: "5px 12px", color: "rgba(201,185,154,0.5)",
+                  fontSize: 11, cursor: "pointer", fontFamily: "inherit", flexShrink: 0, transition: "all 0.15s",
                 }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(201,185,154,0.45)"; e.currentTarget.style.color = "#c9b99a"; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(201,185,154,0.2)"; e.currentTarget.style.color = "rgba(201,185,154,0.5)"; }}
               >Edit →</button>
 
               {confirmDelete === deck.id ? (

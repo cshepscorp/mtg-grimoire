@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import DeckChat from "./DeckChat";
 import CardGrid from "./card/CardGrid";
 import SetBrowser from "./card/SetBrowser";
@@ -19,6 +20,7 @@ import { VIEW_CARD, VIEW_SEARCH, VIEW_ARTIST, VIEW_FILTER, VIEW_SETS, VIEW_COLOR
 import styles from "./CardExplorer.module.css";
 
 export default function CardExplorer({ initialCardId, initialArtist }) {
+  const router = useRouter();
   const [query, setQuery] = useState("");
   const [searchMode, setSearchMode] = useState("name");
   const [lightboxOpen, setLightboxOpen] = useState(false);
@@ -134,7 +136,7 @@ export default function CardExplorer({ initialCardId, initialArtist }) {
           onSelectCollectionCard={(item) => loadCardById(item.cardId)}
           onRemoveFromCollection={removeFromCollection}
           decks={decks}
-          onSelectDeck={(deck) => { /* TODO: open deck editor */ }}
+          onSelectDeck={(deck) => router.push(`/deck/${deck.id}`)}
           onRemoveDeck={deleteDeck}
           mobileOpen={mobileSidebarOpen}
           onClose={() => setMobileSidebarOpen(false)}

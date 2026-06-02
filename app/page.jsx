@@ -1,10 +1,11 @@
 import CardExplorer from "@/components/CardExplorer";
 
-export default function Home({ searchParams }) {
+export default async function Home({ searchParams }) {
+  const params = await searchParams;
   return (
     <CardExplorer
-      initialCardId={searchParams?.openCard}
-      initialArtist={searchParams?.openArtist}
+      initialCardId={params?.openCard}
+      initialArtist={params?.openArtist}
     />
   );
 }
