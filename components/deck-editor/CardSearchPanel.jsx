@@ -199,6 +199,7 @@ export default function CardSearchPanel({ onAddCard, existingCards, format, onFo
   }, [query]);
 
   const deckCountMap = existingCards.reduce((acc, c) => { acc[c.cardId] = c.quantity; return acc; }, {});
+  const defaultPreviewItem = collection.find(item => item.imageUri);
 
   const collectionMatches = collection.filter(item =>
     query.trim().length >= 2
@@ -290,26 +291,54 @@ export default function CardSearchPanel({ onAddCard, existingCards, format, onFo
         </div>
 
         {/* Desktop preview panel */}
-        {(selectedCard || hoveredCard) && (
-          <div style={{ width: 220, flexShrink: 0, borderLeft: "0.5px solid rgba(201,185,154,0.1)", overflowY: "auto" }}>
-            {selectedCard ? (
-              <CardPreviewPanel
-                card={selectedCard}
-                deckCount={deckCountMap[selectedCard.id] ?? 0}
-                onAddToDeck={handleAddToDeck}
-                onClose={() => setSelectedCard(null)}
+        <div style={{ width: 220, flexShrink: 0, borderLeft: "0.5px solid rgba(201,185,154,0.1)", overflowY: "auto" }}>
+          {selectedCard ? (
+            <CardPreviewPanel
+              card={selectedCard}
+              deckCount={deckCountMap[selectedCard.id] ?? 0}
+              onAddToDeck={handleAddToDeck}
+              onClose={() => setSelectedCard(null)}
+            />
+          ) : (hoveredCard?.image_uris?.normal ?? hoveredCard?.card_faces?.[0]?.image_uris?.normal) ? (
+            <div style={{ padding: "1rem" }}>
+              <img
+                src={hoveredCard.image_uris?.normal ?? hoveredCard.card_faces?.[0]?.image_uris?.normal}
+                alt={hoveredCard.name}
+                style={{ width: "100%", borderRadius: 8, display: "block" }}
               />
-            ) : (hoveredCard?.image_uris?.normal ?? hoveredCard?.card_faces?.[0]?.image_uris?.normal) ? (
-              <div style={{ padding: "1rem" }}>
-                <img
-                  src={hoveredCard.image_uris?.normal ?? hoveredCard.card_faces?.[0]?.image_uris?.normal}
-                  alt={hoveredCard.name}
-                  style={{ width: "100%", borderRadius: 8, display: "block" }}
-                />
+            </div>
+          ) : defaultPreviewItem ? (
+            <div style={{ padding: "1rem" }}>
+              <img
+                src={defaultPreviewItem.imageUri}
+                alt={defaultPreviewItem.cardName}
+                style={{ width: "100%", borderRadius: 8, display: "block", opacity: 0.6 }}
+              />
+              <div style={{ fontSize: 10, color: "rgba(201,185,154,0.35)", textAlign: "center", marginTop: 10, fontStyle: "italic", lineHeight: 1.5 }}>
+                Hover or click a card to preview it
               </div>
-            ) : null}
-          </div>
-        )}
+            </div>
+          ) : (
+            <div style={{ padding: "1.5rem 1rem", display: "flex", flexDirection: "column", alignItems: "center", gap: 16 }}>
+              <div style={{
+                width: "100%", aspectRatio: "5/7", borderRadius: 10,
+                background: "linear-gradient(145deg, #1a2a4a 0%, #0d1a30 50%, #1a2a4a 100%)",
+                border: "0.5px solid rgba(100,140,200,0.2)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+              }}>
+                <div style={{
+                  width: "60%", aspectRatio: "1", borderRadius: "50%",
+                  border: "1.5px solid rgba(100,140,200,0.25)",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: 28, color: "rgba(100,140,200,0.3)",
+                }}>✦</div>
+              </div>
+              <div style={{ fontSize: 11, color: "rgba(201,185,154,0.3)", textAlign: "center", lineHeight: 1.6, fontStyle: "italic" }}>
+                Search for cards above to start building your deck
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Mobile bottom sheet */}
