@@ -241,7 +241,6 @@ export default function useScryfall({ setGalleryContext, setView, skipInitialRan
   return {
     card, printings, activePrinting, setActivePrinting,
     activeFace, setActiveFace, hasFaces, displayCard,
-    lore, loreLoading,
     rulings, rulingsLoading,
     randomLoading, searchLoading, artistLoading, filterLoading,
     error,
