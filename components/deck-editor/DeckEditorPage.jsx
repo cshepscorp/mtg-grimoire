@@ -27,7 +27,16 @@ export default function DeckEditorPage({ deckId }) {
   const [name, setName] = useState(existing?.name ?? "New Deck");
   const [editingName, setEditingName] = useState(false);
   const [format, setFormat] = useState(existing?.format ?? "");
-  const [cards, setCards] = useState(existing?.cards ?? []);
+  const [cards, setCards] = useState(
+    (existing?.cards ?? []).map(c => ({
+      cardId:   c.cardId   ?? c.id   ?? c.name ?? "",
+      cardName: c.cardName ?? c.name ?? "",
+      quantity: c.quantity ?? 1,
+      category: c.category ?? "",
+      manaCost: c.manaCost ?? c.mana_cost ?? "",
+      colors:   c.colors   ?? [],
+    }))
+  );
   const [isDirty, setIsDirty] = useState(false);
   const [mobileTab, setMobileTab] = useState("list");
   const [savedFlash, setSavedFlash] = useState(false);

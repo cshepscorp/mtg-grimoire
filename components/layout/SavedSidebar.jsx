@@ -9,6 +9,7 @@ const DEFAULT_WIDTH = 260;
 const MIN_WIDTH = 220;
 const MAX_WIDTH = 400;
 const COLLAPSE_THRESHOLD = 5;
+const DEFAULT_ITEMS = 3;
 const WIDTH_KEY = "grimoire_sidebar_width";
 const SECTIONS_KEY = "grimoire_sidebar_sections";
 
@@ -42,6 +43,7 @@ export default function SavedSidebar({
 }) {
   const [width, setWidth] = useState(DEFAULT_WIDTH);
   const [sections, setSections] = useState({ artists: null, cards: null, collection: null, decks: null });
+  const [expanded, setExpanded] = useState({ artists: false, cards: false, collection: false, decks: false });
   const isResizing = useRef(false);
   const startX = useRef(0);
   const startWidth = useRef(0);
@@ -148,15 +150,30 @@ export default function SavedSidebar({
 
         {open && (
           <div style={{ marginBottom: 4 }}>
-            {count === 0
-              ? (
-                <p style={{
-                  fontSize: 11, color: "rgba(201,185,154,0.3)", fontStyle: "italic",
-                  lineHeight: 1.6, margin: "2px 0 8px", padding: 0,
-                }}>{emptyText}</p>
-              )
-              : items.map(renderItem)
-            }
+            {count === 0 ? (
+              <p style={{
+                fontSize: 11, color: "rgba(201,185,154,0.3)", fontStyle: "italic",
+                lineHeight: 1.6, margin: "2px 0 8px", padding: 0,
+              }}>{emptyText}</p>
+            ) : (
+              <>
+                {(expanded[key] ? items : items.slice(0, DEFAULT_ITEMS)).map(renderItem)}
+                {count > DEFAULT_ITEMS && (
+                  <button
+                    onClick={() => setExpanded(prev => ({ ...prev, [key]: !prev[key] }))}
+                    style={{
+                      background: "transparent", border: "none", cursor: "pointer",
+                      color: "rgba(201,185,154,0.4)", fontSize: 10, fontFamily: "inherit",
+                      padding: "4px 0 6px", letterSpacing: "0.08em", transition: "color 0.15s",
+                    }}
+                    onMouseEnter={e => e.currentTarget.style.color = "rgba(201,185,154,0.75)"}
+                    onMouseLeave={e => e.currentTarget.style.color = "rgba(201,185,154,0.4)"}
+                  >
+                    {expanded[key] ? "Show less ↑" : `Show ${count - DEFAULT_ITEMS} more ↓`}
+                  </button>
+                )}
+              </>
+            )}
           </div>
         )}
       </div>
