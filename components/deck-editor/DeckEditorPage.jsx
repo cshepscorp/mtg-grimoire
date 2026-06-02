@@ -1,8 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { useGrimoire } from "../../contexts/GrimoireContext";
 import DeckListPanel from "./DeckListPanel";
 import CardSearchPanel from "./CardSearchPanel";
@@ -40,6 +39,13 @@ export default function DeckEditorPage({ deckId }) {
   const [isDirty, setIsDirty] = useState(false);
   const [mobileTab, setMobileTab] = useState("list");
   const [savedFlash, setSavedFlash] = useState(false);
+  const [showLeaveDialog, setShowLeaveDialog] = useState(false);
+
+  useEffect(() => {
+    const handler = (e) => { if (isDirty) { e.preventDefault(); e.returnValue = ""; } };
+    window.addEventListener("beforeunload", handler);
+    return () => window.removeEventListener("beforeunload", handler);
+  }, [isDirty]);
 
   const addCard = (card) => {
     setCards(prev => {
@@ -99,10 +105,12 @@ export default function DeckEditorPage({ deckId }) {
 
       {/* Header */}
       <header style={{ borderBottom: "0.5px solid rgba(201,185,154,0.15)", padding: "0 1.5rem", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0, height: 64, gap: 16 }}>
-        <Link href="/my-grimoire?tab=decks" style={{ textDecoration: "none", color: "rgba(201,185,154,0.5)", fontSize: 12, flexShrink: 0, transition: "color 0.15s" }}
+        <button
+          onClick={() => isDirty ? setShowLeaveDialog(true) : router.push("/my-grimoire?tab=decks")}
+          style={{ background: "transparent", border: "none", color: "rgba(201,185,154,0.5)", fontSize: 12, flexShrink: 0, cursor: "pointer", fontFamily: "inherit", transition: "color 0.15s", padding: 0 }}
           onMouseEnter={e => e.currentTarget.style.color = "#c9b99a"}
           onMouseLeave={e => e.currentTarget.style.color = "rgba(201,185,154,0.5)"}
-        >← My Grimoire</Link>
+        >← My Grimoire</button>
 
         {/* Editable deck name */}
         {editingName ? (
@@ -159,6 +167,48 @@ export default function DeckEditorPage({ deckId }) {
           <CardSearchPanel onAddCard={addCard} existingCards={cards} format={format} onFormatChange={setFormat} />
         </div>
       </div>
+
+      {/* Unsaved changes dialog */}
+      {showLeaveDialog && (
+        <>
+          <div
+            onClick={() => setShowLeaveDialog(false)}
+            style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", zIndex: 100 }}
+          />
+          <div style={{
+            position: "fixed", top: "50%", left: "50%", transform: "translate(-50%, -50%)",
+            zIndex: 101, background: "#1a1712", border: "0.5px solid rgba(201,185,154,0.2)",
+            borderRadius: 12, padding: "2rem", width: 320, display: "flex", flexDirection: "column", gap: 16,
+          }}>
+            <div style={{ fontSize: 15, fontWeight: 600, color: "#e8dcc8" }}>Unsaved changes</div>
+            <div style={{ fontSize: 13, color: "rgba(201,185,154,0.6)", lineHeight: 1.6 }}>
+              You have unsaved changes to this deck. If you leave now they'll be lost.
+            </div>
+            <div style={{ display: "flex", gap: 10, marginTop: 4 }}>
+              <button
+                onClick={() => setShowLeaveDialog(false)}
+                style={{
+                  flex: 1, background: "transparent", border: "0.5px solid rgba(201,185,154,0.2)",
+                  borderRadius: 7, padding: "10px", color: "rgba(201,185,154,0.6)", fontSize: 13,
+                  cursor: "pointer", fontFamily: "inherit", transition: "all 0.15s",
+                }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(201,185,154,0.4)"; e.currentTarget.style.color = "#c9b99a"; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(201,185,154,0.2)"; e.currentTarget.style.color = "rgba(201,185,154,0.6)"; }}
+              >Keep editing</button>
+              <button
+                onClick={() => router.push("/my-grimoire?tab=decks")}
+                style={{
+                  flex: 1, background: "rgba(180,60,60,0.12)", border: "0.5px solid rgba(180,60,60,0.3)",
+                  borderRadius: 7, padding: "10px", color: "rgba(220,120,100,0.9)", fontSize: 13,
+                  cursor: "pointer", fontFamily: "inherit", transition: "all 0.15s",
+                }}
+                onMouseEnter={e => { e.currentTarget.style.background = "rgba(180,60,60,0.2)"; e.currentTarget.style.borderColor = "rgba(180,60,60,0.5)"; }}
+                onMouseLeave={e => { e.currentTarget.style.background = "rgba(180,60,60,0.12)"; e.currentTarget.style.borderColor = "rgba(180,60,60,0.3)"; }}
+              >Leave without saving</button>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }
