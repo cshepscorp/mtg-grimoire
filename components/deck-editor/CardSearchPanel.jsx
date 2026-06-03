@@ -291,7 +291,7 @@ export default function CardSearchPanel({ onAddCard, existingCards, format, onFo
         </div>
 
         {/* Desktop preview panel */}
-        <div style={{ width: 220, flexShrink: 0, borderLeft: "0.5px solid rgba(201,185,154,0.1)", overflowY: "auto" }}>
+        <div className={styles.desktopPreview}>
           {selectedCard ? (
             <CardPreviewPanel
               card={selectedCard}

@@ -28,6 +28,15 @@
   display: none;
 }
 
+.desktopPreview {
+  display: flex;
+  flex-direction: column;
+  width: 220px;
+  flex-shrink: 0;
+  border-left: 0.5px solid rgba(201,185,154,0.1);
+  overflow-y: auto;
+}
+
 @media (max-width: 768px) {
   .layout {
     flex-direction: column;
@@ -54,5 +63,9 @@
 
   .mobileSheet {
     display: block;
+  }
+
+  .desktopPreview {
+    display: none;
   }
 }
