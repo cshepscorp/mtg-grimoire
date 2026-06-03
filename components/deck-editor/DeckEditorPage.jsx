@@ -27,6 +27,7 @@ export default function DeckEditorPage({ deckId }) {
   const [format, setFormat] = useState("");
   const [cards, setCards] = useState([]);
   const [isDirty, setIsDirty] = useState(false);
+  const [viewMode, setViewMode] = useState("list");
   const [hydrated, setHydrated] = useState(deckId === "new");
 
   useEffect(() => {
@@ -185,8 +186,10 @@ export default function DeckEditorPage({ deckId }) {
 
       {/* Body */}
       <div className={styles.layout}>
-        <div className={`${styles.listPanel} ${mobileTab === "list" ? styles.mobileActive : ""}`}>
-          <DeckListPanel cards={cards} onUpdateQuantity={updateQuantity} onRemoveCard={removeCard} onCardHover={handleDeckCardHover} />
+        <div
+          className={`${styles.listPanel} ${mobileTab === "list" ? styles.mobileActive : ""}`}
+        >
+          <DeckListPanel cards={cards} onUpdateQuantity={updateQuantity} onRemoveCard={removeCard} onCardHover={handleDeckCardHover} viewMode={viewMode} onViewModeChange={setViewMode} />
         </div>
         <div className={`${styles.searchPanel} ${mobileTab === "search" ? styles.mobileActive : ""}`}>
           <CardSearchPanel onAddCard={addCard} existingCards={cards} format={format} onFormatChange={setFormat} deckHoveredCard={deckHoveredCard} />

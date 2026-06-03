@@ -36,8 +36,7 @@ function DeckCardImage({ cardId, cardName, style }) {
   return <img src={src} alt={cardName} style={style} onError={fetchByName} />;
 }
 
-export default function DeckListPanel({ cards, onUpdateQuantity, onRemoveCard, onCardHover }) {
-  const [viewMode, setViewMode] = useState("list"); // "list" | "visual"
+export default function DeckListPanel({ cards, onUpdateQuantity, onRemoveCard, onCardHover, viewMode, onViewModeChange }) {
   const [hoveredTile, setHoveredTile] = useState(null);
   const [expandedCardId, setExpandedCardId] = useState(null); // mobile tap-to-expand
 
@@ -79,8 +78,8 @@ export default function DeckListPanel({ cards, onUpdateQuantity, onRemoveCard, o
         <div style={{ padding: "1rem 1.25rem", borderBottom: "0.5px solid rgba(201,185,154,0.1)", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
           <span style={{ fontSize: 10, color: "rgba(201,185,154,0.5)", letterSpacing: "0.15em", textTransform: "uppercase" }}>Deck</span>
           <div style={{ display: "flex", alignItems: "center", gap: 6, marginLeft: "auto" }}>
-            <button style={TOGGLE_BTN(viewMode === "list")} onClick={() => setViewMode("list")} title="List view">≡</button>
-            <button style={TOGGLE_BTN(viewMode === "visual")} onClick={() => setViewMode("visual")} title="Visual view">⊞</button>
+            <button style={TOGGLE_BTN(viewMode === "list")} onClick={() => onViewModeChange("list")} title="List view">≡</button>
+            <button style={TOGGLE_BTN(viewMode === "visual")} onClick={() => onViewModeChange("visual")} title="Visual view">⊞</button>
           </div>
           <span style={{ fontSize: 12, color: "rgba(201,185,154,0.4)", fontVariantNumeric: "tabular-nums" }}>{total} cards</span>
         </div>
@@ -152,7 +151,7 @@ export default function DeckListPanel({ cards, onUpdateQuantity, onRemoveCard, o
                   <div style={{ fontSize: 10, color: "rgba(201,185,154,0.4)", letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 8 }}>
                     {cat} ({catTotal})
                   </div>
-                  <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 6 }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 6 }}>
                     {catCards.map(card => {
                       const isHovered = hoveredTile === card.cardId;
                       return (
