@@ -167,6 +167,17 @@ export default function DeckListPanel({ cards, onUpdateQuantity, onRemoveCard, o
                             cardName={card.cardName}
                             style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
                           />
+                          {/* Quantity badge */}
+                          {card.quantity > 1 && (
+                            <div style={{
+                              position: "absolute", top: 5, right: 5,
+                              background: "rgba(0,0,0,0.75)", backdropFilter: "blur(2px)",
+                              border: "0.5px solid rgba(201,185,154,0.3)",
+                              borderRadius: 4, padding: "1px 5px",
+                              fontSize: 10, fontWeight: 700, color: "#e8dcc8",
+                              lineHeight: 1.5, pointerEvents: "none",
+                            }}>×{card.quantity}</div>
+                          )}
                           {/* Hover overlay */}
                           {isHovered && (
                             <div style={{
