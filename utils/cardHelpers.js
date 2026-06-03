@@ -8,5 +8,5 @@ export function colorDotColor(colors, colorIdentity) {
 }
 
 export function scryfallImageUrl(id, size = "normal") {
-  return `https://cards.scryfall.io/${size}/front/${id.slice(0, 2)}/${id.slice(2, 4)}/${id}.jpg`;
+  return `https://cards.scryfall.io/${size}/front/${id[0]}/${id[1]}/${id}.jpg`;
 }
