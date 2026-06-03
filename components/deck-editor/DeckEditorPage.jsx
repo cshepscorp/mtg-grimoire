@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useGrimoire } from "../../contexts/GrimoireContext";
+import { scryfallImageUrl } from "../../utils/cardHelpers";
 import DeckListPanel from "./DeckListPanel";
 import CardSearchPanel from "./CardSearchPanel";
 import styles from "./DeckEditor.module.css";
@@ -21,22 +22,41 @@ export default function DeckEditorPage({ deckId }) {
   const { decks, saveDeck } = useGrimoire();
   const router = useRouter();
 
-  const existing = deckId !== "new" ? decks.find(d => d.id === deckId) : null;
-
-  const [name, setName] = useState(existing?.name ?? "New Deck");
+  const [name, setName] = useState("New Deck");
   const [editingName, setEditingName] = useState(false);
-  const [format, setFormat] = useState(existing?.format ?? "");
-  const [cards, setCards] = useState(
-    (existing?.cards ?? []).map(c => ({
-      cardId:   c.cardId   ?? c.id   ?? c.name ?? "",
-      cardName: c.cardName ?? c.name ?? "",
-      quantity: c.quantity ?? 1,
-      category: c.category ?? "",
-      manaCost: c.manaCost ?? c.mana_cost ?? "",
-      colors:   c.colors   ?? [],
-    }))
-  );
+  const [format, setFormat] = useState("");
+  const [cards, setCards] = useState([]);
   const [isDirty, setIsDirty] = useState(false);
+  const [hydrated, setHydrated] = useState(deckId === "new");
+
+  useEffect(() => {
+    if (hydrated || deckId === "new" || !decks.length) return;
+    const found = decks.find(d => d.id === deckId);
+    if (found) {
+      setName(found.name ?? "New Deck");
+      setFormat(found.format ?? "");
+      setCards((found.cards ?? []).map(c => ({
+        cardId:   c.cardId   ?? c.id   ?? c.name ?? "",
+        cardName: c.cardName ?? c.name ?? "",
+        quantity: c.quantity ?? 1,
+        category: c.category ?? "",
+        manaCost: c.manaCost ?? c.mana_cost ?? "",
+        colors:   c.colors   ?? [],
+      })));
+    }
+    setHydrated(true);
+  }, [decks, deckId, hydrated]);
+  const [deckHoveredCard, setDeckHoveredCard] = useState(null);
+
+  const handleDeckCardHover = useCallback((card) => {
+    if (!card) { setDeckHoveredCard(null); return; }
+    setDeckHoveredCard({
+      id: card.cardId,
+      name: card.cardName,
+      image_uris: { normal: scryfallImageUrl(card.cardId) },
+      colors: card.colors ?? [],
+    });
+  }, []);
   const [mobileTab, setMobileTab] = useState("list");
   const [savedFlash, setSavedFlash] = useState(false);
   const [showLeaveDialog, setShowLeaveDialog] = useState(false);
@@ -161,10 +181,10 @@ export default function DeckEditorPage({ deckId }) {
       {/* Body */}
       <div className={styles.layout}>
         <div className={`${styles.listPanel} ${mobileTab === "list" ? styles.mobileActive : ""}`}>
-          <DeckListPanel cards={cards} onUpdateQuantity={updateQuantity} onRemoveCard={removeCard} />
+          <DeckListPanel cards={cards} onUpdateQuantity={updateQuantity} onRemoveCard={removeCard} onCardHover={handleDeckCardHover} />
         </div>
         <div className={`${styles.searchPanel} ${mobileTab === "search" ? styles.mobileActive : ""}`}>
-          <CardSearchPanel onAddCard={addCard} existingCards={cards} format={format} onFormatChange={setFormat} />
+          <CardSearchPanel onAddCard={addCard} existingCards={cards} format={format} onFormatChange={setFormat} deckHoveredCard={deckHoveredCard} />
         </div>
       </div>
 

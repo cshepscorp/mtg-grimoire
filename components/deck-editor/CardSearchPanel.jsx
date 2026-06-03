@@ -163,7 +163,7 @@ function CardPreviewPanel({ card, deckCount, onAddToDeck, onClose }) {
   );
 }
 
-export default function CardSearchPanel({ onAddCard, existingCards, format, onFormatChange }) {
+export default function CardSearchPanel({ onAddCard, existingCards, format, onFormatChange, deckHoveredCard }) {
   const { collection } = useGrimoire();
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
@@ -304,6 +304,14 @@ export default function CardSearchPanel({ onAddCard, existingCards, format, onFo
               <img
                 src={hoveredCard.image_uris?.normal ?? hoveredCard.card_faces?.[0]?.image_uris?.normal}
                 alt={hoveredCard.name}
+                style={{ width: "100%", borderRadius: 8, display: "block" }}
+              />
+            </div>
+          ) : deckHoveredCard?.image_uris?.normal ? (
+            <div style={{ padding: "1rem" }}>
+              <img
+                src={deckHoveredCard.image_uris.normal}
+                alt={deckHoveredCard.name}
                 style={{ width: "100%", borderRadius: 8, display: "block" }}
               />
             </div>
