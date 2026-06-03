@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useGrimoire } from "../../contexts/GrimoireContext";
-import { scryfallImageUrl } from "../../utils/cardHelpers";
+import { scryfallImageUrl, isScryfallId } from "../../utils/cardHelpers";
 import DeckListPanel from "./DeckListPanel";
 import CardSearchPanel from "./CardSearchPanel";
 import styles from "./DeckEditor.module.css";
@@ -48,14 +48,19 @@ export default function DeckEditorPage({ deckId }) {
   }, [decks, deckId, hydrated]);
   const [deckHoveredCard, setDeckHoveredCard] = useState(null);
 
-  const handleDeckCardHover = useCallback((card) => {
+  const handleDeckCardHover = useCallback(async (card) => {
     if (!card) { setDeckHoveredCard(null); return; }
-    setDeckHoveredCard({
-      id: card.cardId,
-      name: card.cardName,
-      image_uris: { normal: scryfallImageUrl(card.cardId) },
-      colors: card.colors ?? [],
-    });
+    let imageUrl = isScryfallId(card.cardId) ? scryfallImageUrl(card.cardId) : null;
+    if (!imageUrl) {
+      try {
+        const res = await fetch(`https://api.scryfall.com/cards/named?exact=${encodeURIComponent(card.cardName)}`);
+        if (res.ok) {
+          const data = await res.json();
+          imageUrl = data.image_uris?.normal ?? data.card_faces?.[0]?.image_uris?.normal;
+        }
+      } catch {}
+    }
+    if (imageUrl) setDeckHoveredCard({ id: card.cardId, name: card.cardName, image_uris: { normal: imageUrl }, colors: card.colors ?? [] });
   }, []);
   const [mobileTab, setMobileTab] = useState("list");
   const [savedFlash, setSavedFlash] = useState(false);

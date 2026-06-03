@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useCallback } from "react";
-import { colorDotColor, scryfallImageUrl } from "../../utils/cardHelpers";
+import { useState, useCallback, useEffect } from "react";
+import { colorDotColor, scryfallImageUrl, isScryfallId } from "../../utils/cardHelpers";
 
 const CATEGORY_ORDER = ["Creatures", "Spells", "Artifacts", "Enchantments", "Planeswalkers", "Lands"];
 
@@ -11,6 +11,30 @@ const QTY_BTN = {
   cursor: "pointer", fontFamily: "inherit", flexShrink: 0,
   display: "flex", alignItems: "center", justifyContent: "center",
 };
+
+function DeckCardImage({ cardId, cardName, style }) {
+  const [src, setSrc] = useState(isScryfallId(cardId) ? scryfallImageUrl(cardId) : null);
+  const [fetchedOnce, setFetchedOnce] = useState(false);
+
+  const fetchByName = useCallback(() => {
+    if (fetchedOnce) return;
+    setFetchedOnce(true);
+    fetch(`https://api.scryfall.com/cards/named?exact=${encodeURIComponent(cardName)}`)
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        const url = data?.image_uris?.normal ?? data?.card_faces?.[0]?.image_uris?.normal;
+        if (url) setSrc(url);
+      })
+      .catch(() => {});
+  }, [cardName, fetchedOnce]);
+
+  useEffect(() => {
+    if (!src) fetchByName();
+  }, []);
+
+  if (!src) return <div style={{ ...style, background: "rgba(201,185,154,0.05)" }} />;
+  return <img src={src} alt={cardName} style={style} onError={fetchByName} />;
+}
 
 export default function DeckListPanel({ cards, onUpdateQuantity, onRemoveCard, onCardHover }) {
   const [viewMode, setViewMode] = useState("list"); // "list" | "visual"
@@ -106,11 +130,10 @@ export default function DeckListPanel({ cards, onUpdateQuantity, onRemoveCard, o
                         {/* Mobile inline image expansion */}
                         {isExpanded && (
                           <div style={{ padding: "8px 0 10px", display: "flex", justifyContent: "center" }}>
-                            <img
-                              src={scryfallImageUrl(card.cardId)}
-                              alt={card.cardName}
+                            <DeckCardImage
+                              cardId={card.cardId}
+                              cardName={card.cardName}
                               style={{ width: "55%", borderRadius: 8, display: "block" }}
-                              onError={e => { e.currentTarget.style.display = "none"; }}
                             />
                           </div>
                         )}
@@ -139,11 +162,10 @@ export default function DeckListPanel({ cards, onUpdateQuantity, onRemoveCard, o
                           onMouseEnter={() => setHoveredTile(card.cardId)}
                           onMouseLeave={() => setHoveredTile(null)}
                         >
-                          <img
-                            src={scryfallImageUrl(card.cardId)}
-                            alt={card.cardName}
+                          <DeckCardImage
+                            cardId={card.cardId}
+                            cardName={card.cardName}
                             style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
-                            onError={e => { e.currentTarget.style.display = "none"; }}
                           />
                           {/* Hover overlay */}
                           {isHovered && (

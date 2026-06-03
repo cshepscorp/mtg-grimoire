@@ -10,3 +10,7 @@ export function colorDotColor(colors, colorIdentity) {
 export function scryfallImageUrl(id, size = "normal") {
   return `https://cards.scryfall.io/${size}/front/${id[0]}/${id[1]}/${id}.jpg`;
 }
+
+export function isScryfallId(str) {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str ?? "");
+}
