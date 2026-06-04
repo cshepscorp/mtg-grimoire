@@ -58,6 +58,27 @@
   border-color: rgba(201,185,154,0.5);
 }
 
+.navSignOut {
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 14px;
+  color: rgba(201,185,154,0.35);
+  font-size: 13px;
+  font-family: inherit;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  text-decoration: none;
+  transition: color 0.15s;
+}
+.navSignOut:hover {
+  color: rgba(201,185,154,0.65);
+}
+
+.navHideMobile {
+  display: inline-flex;
+}
+
 .navSignUp {
   background: rgba(201,185,154,0.12);
   border: 0.5px solid rgba(201,185,154,0.45);
@@ -377,7 +398,7 @@
 @media (max-width: 768px) {
   .hero {
     min-height: auto;
-    padding: 6rem 1.5rem 3.5rem;
+    padding: 10rem 1.5rem 3.5rem;
   }
   .scrollHint {
     display: none;
@@ -435,6 +456,18 @@
   }
   .navLogoText {
     font-size: 15px;
+  }
+  .navHideMobile {
+    display: none;
+  }
+  .navSignIn,
+  .navSignUp,
+  .navSignOut {
+    padding: 7px 12px;
+    font-size: 12px;
+  }
+  .navActions {
+    gap: 6px;
   }
   .footer {
     flex-direction: column;

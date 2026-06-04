@@ -1,6 +1,7 @@
 import Link from "next/link";
 import ArcaneBackground from "./ArcaneBackground";
 import FeatureRow from "./FeatureRow";
+import NavAuthActions from "./NavAuthActions";
 import styles from "./LandingPage.module.css";
 
 const scry = (name) =>
@@ -46,11 +47,7 @@ export default function LandingPage() {
         <Link href="/" className={styles.navLogo}>
           <div className={styles.navLogoText}>Grimoire</div>
         </Link>
-        <div className={styles.navActions}>
-          {/* href → /auth once auth is implemented */}
-          <Link href="/explore" className={styles.navSignIn}>Sign in</Link>
-          <Link href="/explore" className={styles.navSignUp}>Sign up free</Link>
-        </div>
+        <NavAuthActions />
       </nav>
 
       {/* Hero */}
@@ -65,8 +62,7 @@ export default function LandingPage() {
           and craft strategies with AI — all in one place.
         </p>
         <div className={styles.heroCtas}>
-          {/* href → /auth once auth is implemented */}
-          <Link href="/explore" className={styles.ctaPrimary}>Sign up free</Link>
+          <Link href="/auth" className={styles.ctaPrimary}>Sign up free</Link>
           <Link href="/explore" className={styles.ctaSecondary}>Explore cards →</Link>
         </div>
         <div className={styles.scrollHint}>

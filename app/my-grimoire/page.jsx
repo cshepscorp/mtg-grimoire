@@ -9,10 +9,10 @@ import ArtistsTab from "../../components/grimoire/ArtistsTab";
 import DecksTab from "../../components/grimoire/DecksTab";
 
 const TABS = [
-  { id: "favorites",  label: "Favorites" },
-  { id: "collection", label: "Collection" },
-  { id: "artists",    label: "Artists" },
-  { id: "decks",      label: "Decks" },
+  { id: "favorites",  label: "Favorites",  short: "Faves" },
+  { id: "collection", label: "Collection", short: "Collection" },
+  { id: "artists",    label: "Artists",    short: "Artists" },
+  { id: "decks",      label: "Decks",      short: "Decks" },
 ];
 
 export default function MyGrimoirePage() {
@@ -38,30 +38,18 @@ function MyGrimoireContent() {
         display: "flex", alignItems: "center", justifyContent: "space-between",
         flexShrink: 0, height: 72,
       }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "2rem" }}>
-          <Link href="/explore" style={{ textDecoration: "none" }}>
-            <div style={{ fontSize: 20, fontWeight: 700, letterSpacing: "0.14em", color: "#c9b99a", textTransform: "uppercase" }}>Grimoire</div>
-            <div style={{ fontSize: 10, color: "rgba(201,185,154,0.4)", letterSpacing: "0.2em", textTransform: "uppercase", marginTop: 2 }}>Magic: The Gathering Explorer</div>
-          </Link>
-          <div style={{ fontSize: 10, color: "rgba(201,185,154,0.25)", letterSpacing: "0.1em", textTransform: "uppercase", marginTop: 2 }}>/ My Grimoire</div>
-        </div>
-        <Link
-          href="/explore"
-          style={{
-            textDecoration: "none",
-            background: "rgba(201,185,154,0.06)", border: "0.5px solid rgba(201,185,154,0.25)",
-            borderRadius: 6, padding: "8px 16px",
-            color: "rgba(201,185,154,0.7)", fontSize: 12,
-            fontFamily: "Georgia, serif", letterSpacing: "0.05em",
-            transition: "background 0.15s, border-color 0.15s, color 0.15s",
-          }}
-          onMouseEnter={e => { e.currentTarget.style.background = "rgba(201,185,154,0.12)"; e.currentTarget.style.color = "#c9b99a"; e.currentTarget.style.borderColor = "rgba(201,185,154,0.45)"; }}
-          onMouseLeave={e => { e.currentTarget.style.background = "rgba(201,185,154,0.06)"; e.currentTarget.style.color = "rgba(201,185,154,0.7)"; e.currentTarget.style.borderColor = "rgba(201,185,154,0.25)"; }}
+        <Link href="/" style={{ textDecoration: "none", fontSize: 20, fontWeight: 700, letterSpacing: "0.14em", color: "#c9b99a", textTransform: "uppercase" }}>
+          Grimoire
+        </Link>
+        <Link href="/explore" style={{ textDecoration: "none", fontSize: 12, color: "rgba(201,185,154,0.4)", letterSpacing: "0.08em", textTransform: "uppercase", transition: "color 0.15s" }}
+          onMouseEnter={e => e.currentTarget.style.color = "#c9b99a"}
+          onMouseLeave={e => e.currentTarget.style.color = "rgba(201,185,154,0.4)"}
         >← Explorer</Link>
       </header>
 
       {/* Tab bar */}
-      <div style={{ borderBottom: "0.5px solid rgba(201,185,154,0.12)", padding: "0 2rem", display: "flex", flexShrink: 0 }}>
+      <style>{`.tab-long{display:inline}@media(max-width:500px){.tab-long{display:none}}.tab-short{display:none}@media(max-width:500px){.tab-short{display:inline}}`}</style>
+      <div style={{ borderBottom: "0.5px solid rgba(201,185,154,0.12)", padding: "0 1rem", display: "flex", flexShrink: 0, overflowX: "auto", scrollbarWidth: "none" }}>
         {TABS.map(tab => (
           <button
             key={tab.id}
@@ -69,15 +57,18 @@ function MyGrimoireContent() {
             style={{
               background: "transparent", border: "none",
               borderBottom: activeTab === tab.id ? "2px solid #c9b99a" : "2px solid transparent",
-              padding: "14px 20px",
+              padding: "14px 16px",
               color: activeTab === tab.id ? "#c9b99a" : "rgba(201,185,154,0.4)",
               fontSize: 12, cursor: "pointer", fontFamily: "inherit",
-              letterSpacing: "0.1em", textTransform: "uppercase",
+              letterSpacing: "0.1em", textTransform: "uppercase", whiteSpace: "nowrap",
               transition: "color 0.15s, border-color 0.15s",
             }}
             onMouseEnter={e => { if (activeTab !== tab.id) e.currentTarget.style.color = "rgba(201,185,154,0.7)"; }}
             onMouseLeave={e => { if (activeTab !== tab.id) e.currentTarget.style.color = "rgba(201,185,154,0.4)"; }}
-          >{tab.label}</button>
+          >
+            <span className="tab-long">{tab.label}</span>
+            <span className="tab-short">{tab.short}</span>
+          </button>
         ))}
       </div>
 

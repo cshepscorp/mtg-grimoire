@@ -97,7 +97,7 @@ export default function ArtistsTab() {
           <ArtistCard
             key={name}
             name={name}
-            onBrowse={() => router.push(`/?openArtist=${encodeURIComponent(name)}`)}
+            onBrowse={() => router.push(`/explore?openArtist=${encodeURIComponent(name)}`)}
             onRemove={() => toggleFavoriteArtist(name)}
           />
         ))}

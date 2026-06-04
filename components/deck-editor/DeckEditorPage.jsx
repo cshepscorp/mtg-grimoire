@@ -22,6 +22,8 @@ export default function DeckEditorPage({ deckId }) {
   const { decks, saveDeck } = useGrimoire();
   const router = useRouter();
 
+  const existing = deckId !== "new" ? decks.find(d => d.id === deckId) ?? null : null;
+
   const [name, setName] = useState("New Deck");
   const [editingName, setEditingName] = useState(false);
   const [format, setFormat] = useState("");

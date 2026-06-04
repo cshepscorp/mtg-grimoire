@@ -1,4 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
+import { useAuth } from "../contexts/AuthContext";
+import { createClient } from "../lib/supabase/client";
 
 const KEY = "grimoire_favorites";
 
@@ -14,44 +16,85 @@ const slim = (card) => ({
 });
 
 export default function useFavorites() {
+  const { user } = useAuth();
   const [favorites, setFavorites] = useState([]);
 
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem(KEY);
-      if (stored) setFavorites(JSON.parse(stored));
-    } catch {}
-  }, []);
+    if (!user) {
+      try {
+        const stored = localStorage.getItem(KEY);
+        setFavorites(stored ? JSON.parse(stored) : []);
+      } catch { setFavorites([]); }
+      return;
+    }
+
+    createClient()
+      .from("user_favorite_cards")
+      .select("card_data")
+      .order("created_at", { ascending: false })
+      .then(({ data, error }) => {
+        if (error) return;
+        if (data.length > 0) {
+          setFavorites(data.map(r => r.card_data));
+        } else {
+          // Migrate localStorage data on first login
+          try {
+            const stored = localStorage.getItem(KEY);
+            if (!stored) return;
+            const items = JSON.parse(stored);
+            if (!items.length) return;
+            setFavorites(items);
+            createClient().from("user_favorite_cards")
+              .upsert(items.map(c => ({ user_id: user.id, card_id: c.id, card_data: c })), { onConflict: "user_id,card_id" })
+              .then();
+          } catch {}
+        }
+      });
+  }, [user?.id]);
 
   const addFavorite = useCallback((card) => {
-    setFavorites(prev => {
-      if (prev.some(c => c.id === card.id)) return prev;
-      const next = [slim(card), ...prev];
-      try { localStorage.setItem(KEY, JSON.stringify(next)); } catch {}
-      return next;
-    });
-  }, []);
+    if (favorites.some(c => c.id === card.id)) return;
+    const slimCard = slim(card);
+    const next = [slimCard, ...favorites];
+    setFavorites(next);
+    try { localStorage.setItem(KEY, JSON.stringify(next)); } catch {}
+    if (user) {
+      createClient().from("user_favorite_cards")
+        .upsert({ user_id: user.id, card_id: card.id, card_data: slimCard }, { onConflict: "user_id,card_id" })
+        .then();
+    }
+  }, [user, favorites]);
 
   const removeFavorite = useCallback((cardId) => {
-    setFavorites(prev => {
-      const next = prev.filter(c => c.id !== cardId);
-      try { localStorage.setItem(KEY, JSON.stringify(next)); } catch {}
-      return next;
-    });
-  }, []);
+    const next = favorites.filter(c => c.id !== cardId);
+    setFavorites(next);
+    try { localStorage.setItem(KEY, JSON.stringify(next)); } catch {}
+    if (user) {
+      createClient().from("user_favorite_cards")
+        .delete().eq("user_id", user.id).eq("card_id", cardId)
+        .then();
+    }
+  }, [user, favorites]);
 
   const isFavorite = useCallback((cardId) => {
     return favorites.some(c => c.id === cardId);
   }, [favorites]);
 
   const toggleFavorite = useCallback((card) => {
-    setFavorites(prev => {
-      const exists = prev.some(c => c.id === card.id);
-      const next = exists ? prev.filter(c => c.id !== card.id) : [slim(card), ...prev];
-      try { localStorage.setItem(KEY, JSON.stringify(next)); } catch {}
-      return next;
-    });
-  }, []);
+    const exists = favorites.some(c => c.id === card.id);
+    const slimCard = slim(card);
+    const next = exists ? favorites.filter(c => c.id !== card.id) : [slimCard, ...favorites];
+    setFavorites(next);
+    try { localStorage.setItem(KEY, JSON.stringify(next)); } catch {}
+    if (user) {
+      const sb = createClient();
+      if (exists) {
+        sb.from("user_favorite_cards").delete().eq("user_id", user.id).eq("card_id", card.id).then();
+      } else {
+        sb.from("user_favorite_cards").upsert({ user_id: user.id, card_id: card.id, card_data: slimCard }, { onConflict: "user_id,card_id" }).then();
+      }
+    }
+  }, [user, favorites]);
 
   return { favorites, addFavorite, removeFavorite, isFavorite, toggleFavorite };
 }

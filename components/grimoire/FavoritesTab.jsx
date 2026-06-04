@@ -46,7 +46,7 @@ export default function FavoritesTab() {
           {favorites.map(card => (
             <div key={card.id} style={{ position: "relative" }}>
               <div
-                onClick={() => router.push(`/?openCard=${card.id}`)}
+                onClick={() => router.push(`/explore?openCard=${card.id}`)}
                 style={{ borderRadius: 8, overflow: "hidden", cursor: "pointer", border: "0.5px solid rgba(201,185,154,0.1)", background: "#1a1610", transition: "border-color 0.15s, transform 0.15s" }}
                 onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(201,185,154,0.4)"; e.currentTarget.style.transform = "scale(1.02)"; }}
                 onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(201,185,154,0.1)"; e.currentTarget.style.transform = "scale(1)"; }}
@@ -77,7 +77,7 @@ export default function FavoritesTab() {
           {favorites.map(card => (
             <div key={card.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 0", borderBottom: "0.5px solid rgba(201,185,154,0.06)" }}>
               <span style={{ width: 8, height: 8, borderRadius: "50%", flexShrink: 0, background: colorDotColor(card.colors, card.color_identity), display: "inline-block" }} />
-              <div style={{ flex: 1, minWidth: 0, cursor: "pointer" }} onClick={() => router.push(`/?openCard=${card.id}`)}>
+              <div style={{ flex: 1, minWidth: 0, cursor: "pointer" }} onClick={() => router.push(`/explore?openCard=${card.id}`)}>
                 <div style={{ fontSize: 13, color: "#c9b99a", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{card.name}</div>
                 <div style={{ fontSize: 10, color: "rgba(201,185,154,0.35)", marginTop: 1 }}>{card.set_name} · {card.set?.toUpperCase()}</div>
               </div>

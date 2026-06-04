@@ -1,5 +1,6 @@
 import "./globals.css";
 import { GrimoireProvider } from "../contexts/GrimoireContext";
+import { AuthProvider } from "../contexts/AuthContext";
 
 export const metadata = {
   title: "Grimoire",
@@ -10,9 +11,11 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body>
-        <GrimoireProvider>
-          {children}
-        </GrimoireProvider>
+        <AuthProvider>
+          <GrimoireProvider>
+            {children}
+          </GrimoireProvider>
+        </AuthProvider>
       </body>
     </html>
   );
