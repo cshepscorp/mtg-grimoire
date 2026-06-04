@@ -1,4 +1,5 @@
 import Link from "next/link";
+import ArcaneBackground from "./ArcaneBackground";
 import styles from "./LandingPage.module.css";
 
 const FEATURES = [
@@ -23,8 +24,8 @@ const FEATURES = [
   {
     icon: "✧",
     title: "AI Deck Assistant",
-    desc: "Describe a concept and let the AI build a deck around it. Iterate and refine through conversation.",
-    href: "/deck/new",
+    desc: "Find a card, then let AI build a full deck around it. Refine and iterate through conversation.",
+    href: "/explore",
   },
 ];
 
@@ -47,6 +48,7 @@ export default function LandingPage() {
       {/* Hero */}
       <section className={styles.hero}>
         <div className={styles.heroGlow} />
+        <ArcaneBackground />
         <div className={styles.heroRule}>Magic: The Gathering</div>
         <h1 className={styles.heroTitle}>Grimoire</h1>
         <p className={styles.heroTagline}>Your complete companion</p>
