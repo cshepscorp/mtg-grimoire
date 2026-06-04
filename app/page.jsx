@@ -1,11 +1,5 @@
-import CardExplorer from "@/components/CardExplorer";
+import LandingPage from "@/components/landing/LandingPage";
 
-export default async function Home({ searchParams }) {
-  const params = await searchParams;
-  return (
-    <CardExplorer
-      initialCardId={params?.openCard}
-      initialArtist={params?.openArtist}
-    />
-  );
+export default function Home() {
+  return <LandingPage />;
 }

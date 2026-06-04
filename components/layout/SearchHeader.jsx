@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import Link from "next/link";
 import styles from "./SearchHeader.module.css";
 
 export default function SearchHeader({ query, setQuery, searchMode, setSearchMode, onSearch, onRandom, onOpenSets, onOpenColors, onOpenFavorites, onOpenMySaved, isLoading, onLogoClick }) {
@@ -94,10 +95,10 @@ export default function SearchHeader({ query, setQuery, searchMode, setSearchMod
       gap: "1rem", flexShrink: 0, height: 72,
     }}>
       <div className={styles.headerTop}>
-        <div style={{ cursor: "pointer" }} onClick={onLogoClick}>
+        <Link href="/" style={{ textDecoration: "none" }}>
           <div style={{ fontSize: 20, fontWeight: 700, letterSpacing: "0.14em", color: "#c9b99a", textTransform: "uppercase" }}>Grimoire</div>
           <div className={styles.headerSubtitle} style={{ fontSize: 10, color: "rgba(201,185,154,0.4)", letterSpacing: "0.2em", textTransform: "uppercase", marginTop: 2 }}>Magic: The Gathering Explorer</div>
-        </div>
+        </Link>
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
           <button type="button" onClick={onRandom} disabled={isLoading} className={styles.randomBtn} style={{
             background: "transparent", border: "0.5px solid rgba(255,255,255,0.08)",

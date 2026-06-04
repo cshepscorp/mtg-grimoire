@@ -39,14 +39,14 @@ function MyGrimoireContent() {
         flexShrink: 0, height: 72,
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: "2rem" }}>
-          <Link href="/" style={{ textDecoration: "none" }}>
+          <Link href="/explore" style={{ textDecoration: "none" }}>
             <div style={{ fontSize: 20, fontWeight: 700, letterSpacing: "0.14em", color: "#c9b99a", textTransform: "uppercase" }}>Grimoire</div>
             <div style={{ fontSize: 10, color: "rgba(201,185,154,0.4)", letterSpacing: "0.2em", textTransform: "uppercase", marginTop: 2 }}>Magic: The Gathering Explorer</div>
           </Link>
           <div style={{ fontSize: 10, color: "rgba(201,185,154,0.25)", letterSpacing: "0.1em", textTransform: "uppercase", marginTop: 2 }}>/ My Grimoire</div>
         </div>
         <Link
-          href="/"
+          href="/explore"
           style={{
             textDecoration: "none",
             background: "rgba(201,185,154,0.06)", border: "0.5px solid rgba(201,185,154,0.25)",

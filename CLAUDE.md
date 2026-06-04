@@ -8,22 +8,29 @@ Next.js MTG deck builder and collection tracker.
 
 ## Last Session Summary
 
-### Deck Editor — UX Fixes & Polish (committed `de3c96a`)
+### Deck Editor — Polish, fixes, and responsive layout
 
-**Desktop card search interaction:**
-- Hover a row → image-only preview in sidebar (no buttons)
-- Click a row → pins the full action panel (Add to Deck + Add to Collection); X to unpin
-- Quick "+ Add" button on each row still does direct add-to-deck without opening the panel
-- Fixed hover-gap bug: moved `onMouseLeave` to outer flex container
+**Deck list panel:**
+- Visual mode toggle (⊞/≡) — grid of card images, 5 columns, quantity badge on each tile
+- Hover a list row → shows card image in the shared right-panel preview (no floating tooltip)
+- Mobile: tap a row to expand card image inline; full-screen overlay on tap in add-cards tab
+- `DeckCardImage` component handles both UUID-based and name-based card IDs (AI-generated decks)
+- View mode state lifted to `DeckEditorPage` so layout can respond to it
 
-**Mobile card detail:**
-- Full-screen overlay on tap (was 80vh, pushing buttons off-screen)
-- Add to Deck no longer auto-closes the overlay
+**Layout:**
+- Deck panel: `clamp(300px, 38%, 500px)` — fluid, no jumping between modes
+- Preview panel hides at ≤1100px; mobile tab layout at ≤768px
+- `scryfallImageUrl` fixed to use single-char CDN path segments
 
-**Codex Entry removed:**
-- Removed from `CardDetail.jsx`, `CardExplorer.jsx`, `useScryfall.js`
-- `/api/lore` route still exists on disk but nothing calls it
-- Freed up Anthropic API tokens for deck builder AI chat
+**Bug fixes:**
+- Deck cards lost on page reload — fixed hydration timing (localStorage read in `useEffect`, `useState` initialized before data arrived)
+- AI-generated deck cards used card names as IDs — `DeckCardImage` + `handleDeckCardHover` now detect non-UUID IDs and fetch by name from Scryfall
+- Unsaved changes dialog when navigating away; `beforeunload` for browser refresh
+
+**Other:**
+- Artists tab redesigned as thumbnail grid (fetches art_crop from Scryfall)
+- Sidebar sections truncate to 3 items with "Show N more" expand
+- Codex Entry removed — tokens preserved for deck builder AI chat
 
 ---
 
@@ -40,6 +47,6 @@ Collection action lives in the **preview panel** (not the results row) to keep t
 
 ## Where We Left Off
 
-Deck editor is working and pushed. Next natural areas:
-- Deck builder AI chat (Anthropic API — worth preserving tokens for this)
+All committed and pushed. Next natural areas:
+- Deck builder AI chat (Anthropic API — tokens preserved for this)
 - Supabase integration for persistence (planned — see memory)
