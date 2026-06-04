@@ -1,31 +1,39 @@
 import Link from "next/link";
 import ArcaneBackground from "./ArcaneBackground";
+import FeatureRow from "./FeatureRow";
 import styles from "./LandingPage.module.css";
+
+const scry = (name) =>
+  `https://api.scryfall.com/cards/named?exact=${encodeURIComponent(name)}&format=image&version=art_crop`;
 
 const FEATURES = [
   {
     icon: "✦",
     title: "Card Explorer",
-    desc: "Search 30,000+ Magic cards by name, artist, set, or color identity. Dive into lore, art, and rulings.",
+    desc: "Search 30,000+ Magic cards by name, artist, set, or color identity. Dive deep into lore, art, and rulings.",
     href: "/explore",
+    image: scry("Liliana of the Veil"),
   },
   {
     icon: "⊞",
     title: "Deck Builder",
     desc: "Build and save decks with a fluid editor. Sort by type, color, and CMC. Preview every card as you work.",
     href: "/deck/new",
+    image: scry("Atraxa, Praetors' Voice"),
   },
   {
     icon: "◈",
     title: "Collection",
-    desc: "Log the physical cards you own, track quantities, and know exactly what's in your collection.",
+    desc: "Log the physical cards you own, track quantities by printing, and know exactly what's in your collection.",
     href: "/my-grimoire?tab=collection",
+    image: scry("Black Lotus"),
   },
   {
     icon: "✧",
     title: "AI Deck Assistant",
     desc: "Find a card, then let AI build a full deck around it. Refine and iterate through conversation.",
     href: "/explore",
+    image: scry("Nicol Bolas, Planeswalker"),
   },
 ];
 
@@ -72,15 +80,9 @@ export default function LandingPage() {
       {/* Features */}
       <section className={styles.features}>
         <div className={styles.featuresLabel}>What's inside</div>
-        <div className={styles.featuresGrid}>
-          {FEATURES.map((f) => (
-            <Link key={f.title} href={f.href} className={`${styles.featureCard} ${styles.linked}`}>
-              <div className={styles.featureIcon}>{f.icon}</div>
-              <div className={styles.featureTitle}>{f.title}</div>
-              <p className={styles.featureDesc}>{f.desc}</p>
-            </Link>
-          ))}
-        </div>
+        {FEATURES.map((f, i) => (
+          <FeatureRow key={f.title} feature={f} reverse={i % 2 === 1} />
+        ))}
       </section>
 
       <div className={styles.divider} />

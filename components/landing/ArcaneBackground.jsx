@@ -1,5 +1,7 @@
 "use client";
 
+const n = (v) => +v.toFixed(4);
+
 export default function ArcaneBackground() {
   const cx = 400, cy = 400;
   const g = (a) => `rgba(201,185,154,${a})`;
@@ -15,8 +17,8 @@ export default function ArcaneBackground() {
     ticks.push(
       <line
         key={d}
-        x1={cx + r1 * Math.cos(rad)} y1={cy + r1 * Math.sin(rad)}
-        x2={cx + r2 * Math.cos(rad)} y2={cy + r2 * Math.sin(rad)}
+        x1={n(cx + r1 * Math.cos(rad))} y1={n(cy + r1 * Math.sin(rad))}
+        x2={n(cx + r2 * Math.cos(rad))} y2={n(cy + r2 * Math.sin(rad))}
         stroke={g(isMajor ? 0.16 : isMid ? 0.09 : 0.06)}
         strokeWidth={isMajor ? 1.5 : 0.75}
       />
@@ -26,8 +28,8 @@ export default function ArcaneBackground() {
   // Diamond markers at 12 major positions (every 30°)
   const majorMarkers = Array.from({ length: 12 }, (_, i) => {
     const a = (i * 30 - 90) * Math.PI / 180;
-    const mx = cx + 390 * Math.cos(a);
-    const my = cy + 390 * Math.sin(a);
+    const mx = n(cx + 390 * Math.cos(a));
+    const my = n(cy + 390 * Math.sin(a));
     return (
       <rect
         key={i}
@@ -44,7 +46,7 @@ export default function ArcaneBackground() {
     return (
       <circle
         key={i}
-        cx={cx + 300 * Math.cos(a)} cy={cy + 300 * Math.sin(a)}
+        cx={n(cx + 300 * Math.cos(a))} cy={n(cy + 300 * Math.sin(a))}
         r={i % 4 === 0 ? 4 : 2}
         fill={g(i % 4 === 0 ? 0.13 : 0.08)}
       />
@@ -54,7 +56,7 @@ export default function ArcaneBackground() {
   // 5 pentagon/pentagram points on r=220 (start from top)
   const pts5 = Array.from({ length: 5 }, (_, i) => {
     const a = (i * 72 - 90) * Math.PI / 180;
-    return { x: cx + 220 * Math.cos(a), y: cy + 220 * Math.sin(a) };
+    return { x: n(cx + 220 * Math.cos(a)), y: n(cy + 220 * Math.sin(a)) };
   });
 
   const pentPath =
@@ -73,8 +75,8 @@ export default function ArcaneBackground() {
     return (
       <line
         key={i}
-        x1={cx + 68 * Math.cos(a)} y1={cy + 68 * Math.sin(a)}
-        x2={cx + 130 * Math.cos(a)} y2={cy + 130 * Math.sin(a)}
+        x1={n(cx + 68 * Math.cos(a))} y1={n(cy + 68 * Math.sin(a))}
+        x2={n(cx + 130 * Math.cos(a))} y2={n(cy + 130 * Math.sin(a))}
         stroke={g(0.09)} strokeWidth={0.75}
       />
     );
