@@ -2,6 +2,7 @@ import Link from "next/link";
 import ArcaneBackground from "./ArcaneBackground";
 import FeatureRow from "./FeatureRow";
 import NavAuthActions from "./NavAuthActions";
+import HeroCtas from "./HeroCtas";
 import styles from "./LandingPage.module.css";
 
 const scry = (name) =>
@@ -61,10 +62,7 @@ export default function LandingPage() {
           Explore thirty thousand cards, track your collection, build decks,
           and craft strategies with AI — all in one place.
         </p>
-        <div className={styles.heroCtas}>
-          <Link href="/auth" className={styles.ctaPrimary}>Sign up free</Link>
-          <Link href="/explore" className={styles.ctaSecondary}>Explore cards →</Link>
-        </div>
+        <HeroCtas />
         <div className={styles.scrollHint}>
           <div className={styles.scrollHintLine} />
           Discover
